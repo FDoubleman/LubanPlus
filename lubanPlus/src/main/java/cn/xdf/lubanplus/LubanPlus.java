@@ -1,11 +1,22 @@
 package cn.xdf.lubanplus;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.net.LinkAddress;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
+import android.os.FileUtils;
 import android.text.TextUtils;
+import android.util.Log;
+import android.webkit.MimeTypeMap;
+
+import androidx.annotation.RequiresApi;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +37,7 @@ public class LubanPlus {
     private Context mContext;
 
     private LubanPlus(Builder builder) {
-        this.mContext =builder.mContext;
+        this.mContext = builder.mContext;
         this.mFiles = builder.mFiles;
         this.mTargetDir = builder.mTargetDir;
         this.mEngine = builder.mEngine;
@@ -37,6 +48,27 @@ public class LubanPlus {
         return new Builder(context);
     }
 
+    /**
+     * 同步获取 单个压缩图片的方法
+     *
+     * @param path 图片路径
+     * @return 压缩后的图片
+     */
+    public File get(String path) {
+        if (Checker.needCompress(100, path)) {
+            // 压缩图片
+            File beforeFile = new File(path);
+            File afterFile = mEngine.compress(beforeFile);
+            return afterFile;
+        }
+        Log.d("LuBanPlus", "get path is error! path:" + path);
+        return null;
+    }
+
+    /**
+     * 同步获取 多个压缩图片的方法
+     * @return
+     */
     public List<File> get() {
         List<File> files = new ArrayList<>();
         for (File beforeFile : mFiles) {
@@ -54,7 +86,7 @@ public class LubanPlus {
     }
 
 
-    public static final class Builder {
+    public static final class Builder implements IBuilder {
 
         private List<File> mFiles;
         private String mTargetDir;
@@ -62,63 +94,117 @@ public class LubanPlus {
         private Context mContext;
 
         private Builder(Context context) {
-            mContext =context;
+            mContext = context;
             mFiles = new ArrayList<>();
-            mEngine= new SampleEngine(context,false);
+            mEngine = new SampleEngine(context, false);
         }
 
         public LubanPlus build() {
             return new LubanPlus(this);
         }
 
-        /**
-         * 加载图片文件
-         *
-         * @param file file
-         * @return builder
-         */
-        public Builder load(File file) {
-            mFiles.add(file);
+
+        @Override
+        public IBuilder load(File file) {
+            addFile(file);
             return this;
         }
 
-
-        /**
-         * 图片压缩后的存放的路径目录
-         *
-         * @param targetDir targetDir
-         * @return Builder
-         */
-        public Builder targetDir(String targetDir) {
-            mTargetDir = targetDir;
+        @Override
+        public IBuilder load(String path) {
+            File file = new File(path);
+            addFile(file);
             return this;
         }
 
-        /**
-         * 同步方法获得压缩图片
-         *
-         * @return 压缩后的图片
-         */
+        @Override
+        public IBuilder load(Uri uri) {
+            File file = uriToFileApiQ(uri, mContext);
+            if (file == null) {
+                Log.e("LuBanPlus", "load uri is null or nonsupport！");
+            } else {
+                addFile(file);
+            }
+            return this;
+        }
+
+        @Override
+        public <T> IBuilder load(List<T> list) {
+            for (T t : list) {
+                if (t instanceof File) {
+                    load((File) t);
+                } else if (t instanceof String) {
+                    load((String) t);
+                } else if (t instanceof Uri) {
+                    load((Uri) t);
+                } else {
+                    Log.d("LuBan load ", "list Item error! about t : " + t.toString());
+                }
+            }
+            return this;
+        }
+
+        @Override
+        public File get(String path) {
+            return build().get(path);
+        }
+
+        @Override
         public List<File> get() {
             return build().get();
         }
 
+        @Override
+        public void launch() {
+
+        }
+
+        //------------------------------------------------------------
+
+        /**
+         * 添加待压缩的图片
+         *
+         * @param file 图片
+         */
+        private void addFile(File file) {
+            mFiles.add(file);
+        }
 
 
         /**
-         * 获取图片缓存文件
-         * @param suffix 原文件路径
-         * @return 图片缓存文件
+         * 通过 url 转换成File方法；
+         * 注意考虑大文件 耗时问题！！
+         *
+         * @param uri     uri
+         * @param context context
+         * @return File
          */
-//        public File getImageCacheFile(String suffix) {
-//            String targetDir = Environment.getDataDirectory().getAbsolutePath() +
-//                    File.separator + sCacheFileDirName;
+        private static File uriToFileApiQ(Uri uri, Context context) {
+            File file = null;
+            if (uri == null) return file;
+            //android10以上转换
+            if (uri.getScheme().equals(ContentResolver.SCHEME_FILE)) {
+                file = new File(uri.getPath());
+            } else if (uri.getScheme().equals(ContentResolver.SCHEME_CONTENT)) {
+                // 把文件复制到沙盒目录
+                Log.e("LuBanPlus_uriToFileApiQ", "nonsupport uri :" + uri);
+//                ContentResolver contentResolver = context.getContentResolver();
+//                String displayName = System.currentTimeMillis() + Math.round((Math.random() + 1) * 1000)
+//                        + "." + MimeTypeMap.getSingleton().getExtensionFromMimeType(contentResolver.getType(uri));
 //
-//            String cacheBuilder = targetDir + "/" +
-//                    System.currentTimeMillis() +
-//                    (int) (Math.random() * 1000) +
-//                    (TextUtils.isEmpty(suffix) ? ".jpg" : suffix);
-//            return new File(cacheBuilder);
-//        }
+//                try {
+//                    InputStream is = contentResolver.openInputStream(uri);
+//                    File cache = new File(context.getCacheDir().getAbsolutePath(), displayName);
+//                    FileOutputStream fos = new FileOutputStream(cache);
+//                    FileUtils.copy(is, fos);
+//                    file = cache;
+//                    fos.close();
+//                    is.close();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+            }
+            return file;
+        }
     }
 }

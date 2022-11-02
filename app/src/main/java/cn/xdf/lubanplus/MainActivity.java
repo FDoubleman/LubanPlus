@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
                 testLubanPlus();
 //                getImageCacheFile("png");
 //                File file = new File(getExternalFilesDir(null), "test_2.png");
-                Log.d("fmm","createTestImageFile");
+                Log.d("fmm", "createTestImageFile");
             }
         });
         initPermission();
@@ -67,11 +67,14 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void testLubanPlus() {
+        File srcFile = new File(getExternalFilesDir(null), "test_1.png");
 
-        List<File> file = LubanPlus.with(this)
-                        .load(new File(getExternalFilesDir(null), "test_1.png"))
-                .get();
+//        List<File> files = LubanPlus.with(this)
+//                .load(srcFile)
+//                .get();
 
+         File file1 = LubanPlus.with(this).get(srcFile.getAbsolutePath());
+        // LubanPlus.with(this).load("").get()
     }
 
     public void createTestImageFile() {
@@ -102,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
         String cacheBuilder = targetDir + "/" +
                 System.currentTimeMillis() +
                 (int) (Math.random() * 1000) +
-                (TextUtils.isEmpty(suffix) ? ".jpg" : "."+suffix);
+                (TextUtils.isEmpty(suffix) ? ".jpg" : "." + suffix);
         return new File(cacheBuilder);
     }
 
