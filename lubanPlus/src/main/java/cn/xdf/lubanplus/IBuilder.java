@@ -28,4 +28,6 @@ public interface IBuilder {
     // 异步方法 压缩文件
     void launch();
 
+    IBuilder setCompressListener(ICompressListener compressListener);
+
 }

@@ -2,6 +2,7 @@ package cn.xdf.lubanplus;
 
 import android.Manifest;
 import android.annotation.TargetApi;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.os.Build;
@@ -12,6 +13,7 @@ import com.google.android.material.snackbar.Snackbar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Environment;
+import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -32,6 +34,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -68,12 +71,37 @@ public class MainActivity extends AppCompatActivity {
 
     private void testLubanPlus() {
         File srcFile = new File(getExternalFilesDir(null), "test_1.png");
-
+        List<File> list = new ArrayList<>();
+        list.add(srcFile);
+        list.add(srcFile);
+        list.add(srcFile);
+        list.add(srcFile);
 //        List<File> files = LubanPlus.with(this)
 //                .load(srcFile)
 //                .get();
 
-         File file1 = LubanPlus.with(this).get(srcFile.getAbsolutePath());
+//        File file1 = LubanPlus.with(this).get(srcFile.getAbsolutePath());
+
+
+        LubanPlus.with(this).load(list)
+                .setCompressListener(new ICompressListener() {
+            @Override
+            public void onStart() {
+                Log.d("Luban", "onStart");
+            }
+
+            @Override
+            public void onSuccess(File file) {
+                Log.d("Luban", "onSuccess file path: " + file.getAbsolutePath());
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                Log.d("Luban", "onStart e :" + e.toString());
+            }
+        }).launch();
+
+
         // LubanPlus.with(this).load("").get()
     }
 
@@ -142,6 +170,12 @@ public class MainActivity extends AppCompatActivity {
     private void initPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0x0001);
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            if(!Environment.isExternalStorageManager()){
+                startActivity(new Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION));
+            }
         }
     }
 }

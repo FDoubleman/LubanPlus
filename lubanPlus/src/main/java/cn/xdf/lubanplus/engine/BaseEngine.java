@@ -75,15 +75,22 @@ public abstract class BaseEngine implements IEngine {
      * @return 图片缓存文件
      */
     public File getImageCacheFile(String suffix) {
-        String targetDir = context.getCacheDir().getAbsolutePath()+File.separator + sCacheFileDirName;
+        String targetDir = context.getCacheDir().getAbsolutePath();
 
+//        String targetDir = Environment.getDownloadCacheDirectory().getAbsolutePath();
 //        String targetDir = Environment.getDownloadCacheDirectory().getAbsolutePath() +
 //                File.separator + sCacheFileDirName;
+        // 文件夹不存在 创建
+//        File dirFile = new File(targetDir);
+//        if(!dirFile.exists()){
+//            dirFile.mkdirs();
+//        }
 
         String cacheBuilder = targetDir + "/" +
                 System.currentTimeMillis() +
                 (int) (Math.random() * 1000) +
                 (TextUtils.isEmpty(suffix) ? ".jpg" : "."+suffix);
+
 //        File file = new File(cacheBuilder);
 //        if(!file.exists()){
 //            file.mkdirs();
