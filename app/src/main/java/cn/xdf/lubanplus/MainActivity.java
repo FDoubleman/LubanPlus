@@ -83,7 +83,30 @@ public class MainActivity extends AppCompatActivity {
 //        File file1 = LubanPlus.with(this).get(srcFile.getAbsolutePath());
 
 
-        LubanPlus.with(this).load(list)
+//        LubanPlus.with(this).load(list)
+//                .setCompressListener(new ICompressListener() {
+//                    @Override
+//                    public void onStart() {
+//                        Log.d("Luban", "onStart");
+//                    }
+//
+//                    @Override
+//                    public void onSuccess(Furniture furn) {
+//                        Log.d("Luban", "onSuccess file path: " + furn.getTargetAbsolutePath());
+//                    }
+//
+//                    @Override
+//                    public void onError(Throwable e) {
+//                        Log.d("Luban", "onStart e :" + e.toString());
+//                    }
+//                }).launch();
+
+
+        // LubanPlus.with(this).load("").get()
+
+
+        LubanPlus.with(this)
+                .load(list)
                 .setCompressListener(new ICompressListener() {
                     @Override
                     public void onStart() {
@@ -99,10 +122,18 @@ public class MainActivity extends AppCompatActivity {
                     public void onError(Throwable e) {
                         Log.d("Luban", "onStart e :" + e.toString());
                     }
-                }).launch();
+                }).setFilterListener(new IFilterListener() {
+                    @Override
+                    public boolean isFilter(Furniture furn) {
+                        Log.d("Luban", "isFilter file path: " + furn.getSrcAbsolutePath());
+                        return false;
+                    }
+                }).setFocusAlpha(false)
+                .setTargetDir(null)
+                .setIgnoreBy(110)
+                .launch();
 
 
-        // LubanPlus.with(this).load("").get()
     }
 
     public void createTestImageFile() {

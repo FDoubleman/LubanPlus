@@ -23,11 +23,8 @@ import cn.xdf.lubanplus.Furniture;
 public class SampleEngine extends BaseEngine {
 
 
-    private boolean mFocusAlpha;
-
-    public SampleEngine(Context context,boolean focusAlpha) {
+    public SampleEngine(Context context) {
         super(context);
-        mFocusAlpha = focusAlpha;
     }
 
     @Override

@@ -7,7 +7,7 @@ import java.io.File;
 /**
  * author:fumm
  * Date : 2022/ 11/ 03 10:52
- * Dec : 数据操作流转类
+ * Dec : 图片压缩数据操作流转类
  **/
 public class Furniture {
     private static final int SRC_WIDTH_DEFAULT = -1 << 3;

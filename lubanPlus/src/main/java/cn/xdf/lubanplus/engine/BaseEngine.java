@@ -21,9 +21,12 @@ import cn.xdf.lubanplus.Furniture;
  **/
 public abstract class BaseEngine implements IEngine {
     private static final String sCacheFileDirName = "LuBanPlus";
-    private Context context;
-    private BaseEngine() {
+    protected Context context;
+    protected String mTargetDir;
+    protected boolean mFocusAlpha = true;
 
+
+    private BaseEngine() {
     }
 
     public BaseEngine(Context context) {
@@ -36,6 +39,15 @@ public abstract class BaseEngine implements IEngine {
     }
 
     public abstract Furniture realCompress(Furniture src);
+
+    public void setTargetDir(String targetDir){
+        this.mTargetDir = targetDir;
+    }
+
+    public void setFocusAlpha(boolean focusAlpha){
+        this.mFocusAlpha = focusAlpha;
+    }
+
 
     protected int computeSize(int srcWidth, int srcHeight) {
         srcWidth = srcWidth % 2 == 1 ? srcWidth + 1 : srcWidth;
@@ -77,7 +89,12 @@ public abstract class BaseEngine implements IEngine {
      * @return 图片缓存文件
      */
     public File getImageCacheFile(String suffix) {
-        String targetDir = context.getCacheDir().getAbsolutePath();
+        String targetDir;
+        if(TextUtils.isEmpty(mTargetDir)){
+            targetDir = context.getCacheDir().getAbsolutePath();
+        }else{
+            targetDir = mTargetDir;
+        }
 
 //        String targetDir = Environment.getDownloadCacheDirectory().getAbsolutePath();
 //        String targetDir = Environment.getDownloadCacheDirectory().getAbsolutePath() +
