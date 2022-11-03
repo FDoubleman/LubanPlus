@@ -85,21 +85,21 @@ public class MainActivity extends AppCompatActivity {
 
         LubanPlus.with(this).load(list)
                 .setCompressListener(new ICompressListener() {
-            @Override
-            public void onStart() {
-                Log.d("Luban", "onStart");
-            }
+                    @Override
+                    public void onStart() {
+                        Log.d("Luban", "onStart");
+                    }
 
-            @Override
-            public void onSuccess(File file) {
-                Log.d("Luban", "onSuccess file path: " + file.getAbsolutePath());
-            }
+                    @Override
+                    public void onSuccess(Furniture furn) {
+                        Log.d("Luban", "onSuccess file path: " + furn.getTargetAbsolutePath());
+                    }
 
-            @Override
-            public void onError(Throwable e) {
-                Log.d("Luban", "onStart e :" + e.toString());
-            }
-        }).launch();
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.d("Luban", "onStart e :" + e.toString());
+                    }
+                }).launch();
 
 
         // LubanPlus.with(this).load("").get()
@@ -173,7 +173,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            if(!Environment.isExternalStorageManager()){
+            if (!Environment.isExternalStorageManager()) {
                 startActivity(new Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION));
             }
         }

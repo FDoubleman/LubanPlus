@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import cn.xdf.lubanplus.Checker;
+import cn.xdf.lubanplus.Furniture;
 
 /**
  * author:fumm
@@ -30,12 +31,13 @@ public class SampleEngine extends BaseEngine {
     }
 
     @Override
-    public File realCompress(File src) {
+    public Furniture realCompress(Furniture furni) {
         BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inSampleSize = computeSize(srcWidth(src), srcHeight(src));
 
-        Bitmap tagBitmap = BitmapFactory.decodeFile(src.getAbsolutePath(), options);
-        if (Checker.isJPG(src)) {
+        options.inSampleSize = computeSize(furni.getSrcWidth(), furni.getSrcHeight());
+
+        Bitmap tagBitmap = BitmapFactory.decodeFile(furni.getSrcAbsolutePath(), options);
+        if (Checker.isJPG(furni.getSrcFile())) {
             // TODO:tagBitmap=rotatingImage();
         }
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -43,7 +45,7 @@ public class SampleEngine extends BaseEngine {
                 80, outputStream);
 
         // outputStream 转换为File
-        File targetFile = getImageCacheFile(Checker.getSuffix(src));
+        File targetFile = getImageCacheFile(Checker.getSuffix(furni.getSrcFile()));
         FileOutputStream fos = null;
         try {
             fos = new FileOutputStream(targetFile);
@@ -61,6 +63,7 @@ public class SampleEngine extends BaseEngine {
                 }
             }
         }
-        return targetFile;
+        furni.setTargetFile(targetFile);
+        return furni;
     }
 }

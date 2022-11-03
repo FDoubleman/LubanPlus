@@ -20,10 +20,10 @@ public interface IBuilder {
 
 
     // 同步方法 压缩单个文件方法
-    File get(String path);
+    Furniture get(String path);
 
     // 同步方法 压缩多个文件方法
-    List<File> get();
+    List<Furniture> get();
 
     // 异步方法 压缩文件
     void launch();

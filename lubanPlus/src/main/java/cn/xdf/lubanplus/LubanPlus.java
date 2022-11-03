@@ -43,7 +43,7 @@ public class LubanPlus implements Handler.Callback {
     private static final int MSG_COMPRESS_START = 1;
     private static final int MSG_COMPRESS_ERROR = 2;
 
-    private List<File> mFiles;
+    private List<Furniture> mFurnitureList;
     private String mTargetDir;
     private IEngine mEngine;
     private ICompressListener mCompressListener;
@@ -53,7 +53,7 @@ public class LubanPlus implements Handler.Callback {
     private Handler mHandler;
 
     private LubanPlus(Builder builder) {
-        this.mFiles = builder.mFiles;
+        this.mFurnitureList = builder.mFurnitureList;
         this.mTargetDir = builder.mTargetDir;
         this.mEngine = builder.mEngine;
         this.mCompressListener = builder.mCompressListener;
@@ -71,11 +71,12 @@ public class LubanPlus implements Handler.Callback {
      * @param path 图片路径
      * @return 压缩后的图片
      */
-    private File get(String path) {
+    private Furniture get(String path) {
         if (Checker.needCompress(100, path)) {
             // 压缩图片
             File beforeFile = new File(path);
-            File afterFile = mEngine.compress(beforeFile);
+
+            Furniture afterFile = mEngine.compress(new Furniture(beforeFile));
             return afterFile;
         }
         Log.d("LuBanPlus", "get path is error! path:" + path);
@@ -87,36 +88,52 @@ public class LubanPlus implements Handler.Callback {
      *
      * @return
      */
-    private List<File> get() {
-        List<File> files = new ArrayList<>();
+    private List<Furniture> get() {
+        List<Furniture> furnitureList = new ArrayList<>();
 
-        Iterator<File> iterable = mFiles.iterator();
+        Iterator<Furniture> iterable = mFurnitureList.iterator();
         while (iterable.hasNext()) {
-            File beforeFile = iterable.next();
-            if (Checker.needCompress(100, beforeFile.getAbsolutePath())) {
+            Furniture beforeFur = iterable.next();
+            if (Checker.needCompress(100, beforeFur.getSrcAbsolutePath())) {
                 // 压缩图片
-                File afterFile = mEngine.compress(beforeFile);
-                files.add(afterFile);
+                Furniture afterFur = mEngine.compress(beforeFur);
+                furnitureList.add(afterFur);
             } else {
-                files.add(beforeFile);
+                furnitureList.add(beforeFur);
             }
             iterable.remove();
         }
         // 返回图片
-        return files;
+        return furnitureList;
     }
 
     private void launch() {
-        Iterator<File> iterable = mFiles.iterator();
+        Iterator<Furniture> iterable = mFurnitureList.iterator();
         while (iterable.hasNext()) {
-            File beforeFile = iterable.next();
+            Furniture beforeFurn = iterable.next();
+
+//            mExecutor.execute(new Runnable() {
+//                @Override
+//                public void run() {
+//                    try {
+//                        mHandler.sendMessage(mHandler.obtainMessage(MSG_COMPRESS_START));
+//                        File file = mEngine.compress(beforeFile);
+//                        Log.d("run","Thread name :"+Thread.currentThread().getName());
+//                        mHandler.sendMessage(mHandler.obtainMessage(MSG_COMPRESS_SUCCESS, file));
+//                    } catch (Exception e) {
+//                        mHandler.sendMessage(mHandler.obtainMessage(MSG_COMPRESS_ERROR, e));
+//                    }
+//                }
+//            });
+
             AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
                 @Override
                 public void run() {
                     try {
                         mHandler.sendMessage(mHandler.obtainMessage(MSG_COMPRESS_START));
-                        File file = mEngine.compress(beforeFile);
-                        mHandler.sendMessage(mHandler.obtainMessage(MSG_COMPRESS_SUCCESS, file));
+                        Furniture furn = mEngine.compress(beforeFurn);
+                        Log.d("run", "Thread name :" + Thread.currentThread().getName());
+                        mHandler.sendMessage(mHandler.obtainMessage(MSG_COMPRESS_SUCCESS, furn));
                     } catch (Exception e) {
                         mHandler.sendMessage(mHandler.obtainMessage(MSG_COMPRESS_ERROR, e));
                     }
@@ -134,7 +151,7 @@ public class LubanPlus implements Handler.Callback {
                 mCompressListener.onStart();
                 break;
             case MSG_COMPRESS_SUCCESS:
-                mCompressListener.onSuccess((File) msg.obj);
+                mCompressListener.onSuccess((Furniture) msg.obj);
                 break;
             case MSG_COMPRESS_ERROR:
                 mCompressListener.onError((Throwable) msg.obj);
@@ -145,7 +162,7 @@ public class LubanPlus implements Handler.Callback {
 
     public static final class Builder implements IBuilder {
 
-        private List<File> mFiles;
+        private List<Furniture> mFurnitureList;
         private String mTargetDir;
         private IEngine mEngine;
         private Context mContext;
@@ -153,7 +170,7 @@ public class LubanPlus implements Handler.Callback {
 
         private Builder(Context context) {
             mContext = context;
-            mFiles = new ArrayList<>();
+            mFurnitureList = new ArrayList<>();
             mEngine = new SampleEngine(context, false);
         }
 
@@ -214,12 +231,12 @@ public class LubanPlus implements Handler.Callback {
         }
 
         @Override
-        public File get(String path) {
+        public Furniture get(String path) {
             return build().get(path);
         }
 
         @Override
-        public List<File> get() {
+        public List<Furniture> get() {
             return build().get();
         }
 
@@ -227,8 +244,6 @@ public class LubanPlus implements Handler.Callback {
         public void launch() {
             build().launch();
         }
-
-
 
 
         //------------------------------------------------------------
@@ -239,7 +254,9 @@ public class LubanPlus implements Handler.Callback {
          * @param file 图片
          */
         private void addFile(File file) {
-            mFiles.add(file);
+            Furniture furn = new Furniture(file);
+            // TODO 路径 、重命名 。。。
+            mFurnitureList.add(furn);
         }
 
 

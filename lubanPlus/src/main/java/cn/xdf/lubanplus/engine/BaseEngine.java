@@ -11,6 +11,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import cn.xdf.lubanplus.Furniture;
+
 /**
  * author:fumm
  * Date : 2022/ 10/ 31 15:09
@@ -29,11 +31,11 @@ public abstract class BaseEngine implements IEngine {
     }
 
     @Override
-    public File compress(File src) {
+    public Furniture compress(Furniture src) {
         return realCompress(src);
     }
 
-    public abstract File realCompress(File src);
+    public abstract Furniture realCompress(Furniture src);
 
     protected int computeSize(int srcWidth, int srcHeight) {
         srcWidth = srcWidth % 2 == 1 ? srcWidth + 1 : srcWidth;
@@ -103,21 +105,4 @@ public abstract class BaseEngine implements IEngine {
         return new File(cacheBuilder);
     }
 
-    public int srcWidth(File file) {
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-
-        options.inSampleSize = 1;
-        BitmapFactory.decodeFile(file.getAbsolutePath(), options);
-        return options.outWidth;
-    }
-
-    public int srcHeight(File file) {
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-
-        options.inSampleSize = 1;
-        BitmapFactory.decodeFile(file.getAbsolutePath(), options);
-        return options.outHeight;
-    }
 }

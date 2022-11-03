@@ -2,6 +2,8 @@ package cn.xdf.lubanplus.engine;
 
 import java.io.File;
 
+import cn.xdf.lubanplus.Furniture;
+
 /**
  * author:fumm
  * Date : 2022/ 10/ 31 15:13
@@ -9,6 +11,6 @@ import java.io.File;
  **/
 public interface IEngine {
 
-    File compress(File src);
+    Furniture compress(Furniture src);
 
 }
