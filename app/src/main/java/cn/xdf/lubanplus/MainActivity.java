@@ -1,14 +1,10 @@
 package cn.xdf.lubanplus;
 
 import android.Manifest;
-import android.annotation.TargetApi;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.AssetManager;
 import android.os.Build;
 import android.os.Bundle;
-
-import com.google.android.material.snackbar.Snackbar;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -92,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
 //
 //                    @Override
 //                    public void onSuccess(Furniture furn) {
-//                        Log.d("Luban", "onSuccess file path: " + furn.getTargetAbsolutePath());
+//                        Log.d("Luban", "onSuccess file targetDir: " + furn.getTargetAbsolutePath());
 //                    }
 //
 //                    @Override
@@ -104,7 +100,8 @@ public class MainActivity extends AppCompatActivity {
 
         // LubanPlus.with(this).load("").get()
 
-
+//         String targetDir = this.getCacheDir().getAbsolutePath()+File.separator + "LuBanPlus";
+        String targetDir = Environment.getDownloadCacheDirectory().getAbsolutePath();
         LubanPlus.with(this)
                 .load(list)
                 .setCompressListener(new ICompressListener() {
@@ -115,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
 
                     @Override
                     public void onSuccess(Furniture furn) {
-                        Log.d("Luban", "onSuccess file path: " + furn.getTargetAbsolutePath());
+                        Log.d("Luban", "onSuccess file targetDir: " + furn.getTargetAbsolutePath());
                     }
 
                     @Override
@@ -125,11 +122,11 @@ public class MainActivity extends AppCompatActivity {
                 }).setFilterListener(new IFilterListener() {
                     @Override
                     public boolean isFilter(Furniture furn) {
-                        Log.d("Luban", "isFilter file path: " + furn.getSrcAbsolutePath());
+                        Log.d("Luban", "isFilter file targetDir: " + furn.getSrcAbsolutePath());
                         return false;
                     }
                 }).setFocusAlpha(false)
-                .setTargetDir(null)
+                .setTargetDir(targetDir)
                 .setIgnoreBy(110)
                 .launch();
 

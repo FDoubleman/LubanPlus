@@ -70,6 +70,9 @@ public class Furniture {
     }
 
     public String getTargetAbsolutePath() {
+        if(targetFile ==null){
+            return "";
+        }
         return targetFile.getAbsolutePath();
     }
 

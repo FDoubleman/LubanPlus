@@ -48,6 +48,8 @@ public class SampleEngine extends BaseEngine {
             fos = new FileOutputStream(targetFile);
             fos.write(outputStream.toByteArray());
             fos.flush();
+            // IO 异常时不设置
+            furni.setTargetFile(targetFile);
         } catch (IOException ioException) {
             ioException.printStackTrace();
         } finally {
@@ -60,7 +62,6 @@ public class SampleEngine extends BaseEngine {
                 }
             }
         }
-        furni.setTargetFile(targetFile);
         return furni;
     }
 }

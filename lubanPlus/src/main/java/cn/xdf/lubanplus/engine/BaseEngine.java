@@ -104,6 +104,10 @@ public abstract class BaseEngine implements IEngine {
 //        if(!dirFile.exists()){
 //            dirFile.mkdirs();
 //        }
+        File file = new File(targetDir);
+        if(!file.exists()){
+            file.mkdirs();
+        }
 
         String cacheBuilder = targetDir + "/" +
                 System.currentTimeMillis() +
