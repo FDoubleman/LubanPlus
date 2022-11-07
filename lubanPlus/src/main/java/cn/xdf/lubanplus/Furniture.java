@@ -33,6 +33,7 @@ public class Furniture {
 
     /**
      * 获取源图片的宽
+     *
      * @return 源图片的宽
      */
     public int getSrcWidth() {
@@ -44,10 +45,11 @@ public class Furniture {
 
     /**
      * 获取源图片的高
+     *
      * @return 源图片的高
      */
     public int getSrcHeight() {
-        if ( srcHeight== SRC_HEIGHT_DEFAULT) {
+        if (srcHeight == SRC_HEIGHT_DEFAULT) {
             calculateSrcSize();
         }
         return srcHeight;
@@ -70,10 +72,24 @@ public class Furniture {
     }
 
     public String getTargetAbsolutePath() {
-        if(targetFile ==null){
+        if (targetFile == null) {
             return "";
         }
         return targetFile.getAbsolutePath();
+    }
+
+    public long getTargetLenth() {
+        if (targetFile == null) {
+            return 0;
+        }
+        return targetFile.length();
+    }
+
+    public long getSrcLength(){
+        if(srcFile == null){
+            return 0;
+        }
+        return srcFile.length();
     }
 
     public File getSrcFile() {

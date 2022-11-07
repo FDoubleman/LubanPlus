@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 //                createTestImageFile();
-                testLubanPlus();
+                testQulity();
 //                getImageCacheFile("png");
 //                File file = new File(getExternalFilesDir(null), "test_2.png");
                 Log.d("fmm", "createTestImageFile");
@@ -64,9 +64,44 @@ public class MainActivity extends AppCompatActivity {
         initPermission();
     }
 
+    private void testQulity() {
+        File srcFile = new File(getExternalFilesDir(null), "test_1.png");
+        List<File> list = new ArrayList<>();
+        list.add(srcFile);
+        list.add(srcFile);
+        list.add(srcFile);
+        list.add(srcFile);
+
+        //  验证  Alpha 透明度通道 与保持图片格式的 关系
+        //  Alpha : true      false
+
+        Furniture furniture = LubanPlus.with(this)
+                .setQuality(80)
+                .setFocusAlpha(false)
+                .get(srcFile.getAbsolutePath());
+        Log.d("fumm", "target path: " + furniture.getTargetAbsolutePath() +
+                "   src file size :"+ furniture.getSrcLength()+
+                "   target file size : "+ furniture.getTargetLenth() );
+
+
+//        for (int i = 0; i < list.size(); i++) {
+//            Furniture furniture = LubanPlus.with(this)
+//                    .setQuality(100 - (10 * i))
+//                    .setFocusAlpha(false)
+//                    .get(list.get(i).getAbsolutePath());
+//            furniture.getTargetAbsolutePath();
+//            Log.d("fumm", "target path: " + furniture.getTargetAbsolutePath() +
+//                    "   src file size :"+ furniture.getSrcLength()+
+//                    "   target file size : "+ furniture.getTargetLenth() );
+//        }
+
+    }
+
 
     private void testLubanPlus() {
-        File srcFile = new File(getExternalFilesDir(null), "test_1.png");
+//        File srcFile = new File(getExternalFilesDir(null), "test_1.png");
+//        File srcFile = new File(getExternalFilesDir(null), "test_3.jpeg");
+        File srcFile = new File(getExternalFilesDir(null), "test_4.jpg");
         List<File> list = new ArrayList<>();
         list.add(srcFile);
         list.add(srcFile);

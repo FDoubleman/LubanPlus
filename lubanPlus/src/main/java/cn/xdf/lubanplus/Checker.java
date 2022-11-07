@@ -91,5 +91,18 @@ public class Checker {
         return true;
     }
 
+    public static boolean needContinuePress(int ignoreCompressSize, String path) {
+        // 1、图片路径是否正确，图片文件是否存在
+        if (TextUtils.isEmpty(path)) {
+            return false;
+        }
+
+        File source = new File(path);
+        // 2、指定压缩大小是否满足
+        if (!(source.length() > ((long) ignoreCompressSize << 10))) {
+            return false;
+        }
+        return true;
+    }
 
 }

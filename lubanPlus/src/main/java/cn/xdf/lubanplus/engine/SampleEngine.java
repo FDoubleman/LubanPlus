@@ -3,6 +3,7 @@ package cn.xdf.lubanplus.engine;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Log;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -34,12 +35,23 @@ public class SampleEngine extends BaseEngine {
         options.inSampleSize = computeSize(furni.getSrcWidth(), furni.getSrcHeight());
 
         Bitmap tagBitmap = BitmapFactory.decodeFile(furni.getSrcAbsolutePath(), options);
+
+        // TODO 改造---------------------------------------------------
         if (Checker.isJPG(furni.getSrcFile())) {
-            // TODO:tagBitmap=rotatingImage();
+            // TODO: 图片加载旋转角度 tagBitmap=rotatingImage();
         }
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+        // format : png 格式 保留 Alpha 通道 ，jpeg：格式不支持 Alpha通道
+        // quality : png 设置无效
         tagBitmap.compress(mFocusAlpha ? Bitmap.CompressFormat.PNG : Bitmap.CompressFormat.JPEG,
-                80, outputStream);
+                mQuality, outputStream);
+        tagBitmap.recycle();
+
+        Log.d("fumm compress","mQuality : " +mQuality);
+
+
+        // ---------------------------------------------------
 
         // outputStream 转换为File
         File targetFile = getImageCacheFile(Checker.getSuffix(furni.getSrcFile()));

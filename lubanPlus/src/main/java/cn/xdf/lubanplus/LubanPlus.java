@@ -62,6 +62,7 @@ public class LubanPlus implements Handler.Callback {
         this.mEngine = builder.mEngine;
         this.mEngine.setFocusAlpha(builder.mFocusAlpha);
         this.mEngine.setTargetDir(builder.mTargetDir);
+        this.mEngine.setQuality(builder.mQuality);
 
         this.mCompressListener = builder.mCompressListener;
         this.mFilterListener = builder.mFilterListener;
@@ -167,6 +168,22 @@ public class LubanPlus implements Handler.Callback {
     }
 
     /**
+     * 循环压缩图片到指定大小
+     * @param beforeFurn beforeFurn
+     * @return Furniture
+     */
+    private Furniture loopCompress(Furniture beforeFurn) {
+
+        Furniture furn = mEngine.compress(beforeFurn);
+        while (Checker.needContinuePress(mIgnoreCompressSize,
+                furn.getTargetAbsolutePath())) {
+            // 继续压缩
+             furn = mEngine.compress(beforeFurn);
+        }
+        return furn;
+    }
+
+    /**
      * 如果想了解 更多的 注释和方法 请 阅读  IBuilder
      */
     public static final class Builder implements IBuilder {
@@ -176,6 +193,7 @@ public class LubanPlus implements Handler.Callback {
         private String mTargetDir;
         private int mIgnoreCompressSize = 100;
         private boolean mFocusAlpha = true;
+        private int mQuality = 80;
 
         private ICompressListener mCompressListener;
         private IFilterListener mFilterListener;
@@ -250,6 +268,14 @@ public class LubanPlus implements Handler.Callback {
             return this;
         }
 
+        @Override
+        public IBuilder setQuality(int quality) {
+            if (quality <= 0 || quality > 100) {
+                throw new IllegalArgumentException();
+            }
+            mQuality = quality;
+            return this;
+        }
 
         @Override
         public IBuilder setCompressListener(ICompressListener compressListener) {

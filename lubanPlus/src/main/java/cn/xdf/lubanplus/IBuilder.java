@@ -51,6 +51,13 @@ public interface IBuilder {
     IBuilder setFocusAlpha(boolean focusAlpha);
 
     /**
+     * 设置 图片压缩质量
+     * @param quality setQuality 范围 0--100
+     * @return IBuilder
+     */
+    IBuilder setQuality(int quality);
+
+    /**
      * 同步方法 压缩单个文件方法
      *
      * @param path 单个文件路径

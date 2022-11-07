@@ -24,6 +24,7 @@ public abstract class BaseEngine implements IEngine {
     protected Context context;
     protected String mTargetDir;
     protected boolean mFocusAlpha = true;
+    protected int mQuality ;
 
 
     private BaseEngine() {
@@ -40,14 +41,17 @@ public abstract class BaseEngine implements IEngine {
 
     public abstract Furniture realCompress(Furniture src);
 
-    public void setTargetDir(String targetDir){
+    public void setTargetDir(String targetDir) {
         this.mTargetDir = targetDir;
     }
 
-    public void setFocusAlpha(boolean focusAlpha){
+    public void setFocusAlpha(boolean focusAlpha) {
         this.mFocusAlpha = focusAlpha;
     }
 
+    public void setQuality(int quality) {
+        this.mQuality = quality;
+    }
 
     protected int computeSize(int srcWidth, int srcHeight) {
         srcWidth = srcWidth % 2 == 1 ? srcWidth + 1 : srcWidth;
@@ -85,14 +89,15 @@ public abstract class BaseEngine implements IEngine {
 
     /**
      * 获取图片缓存文件
+     *
      * @param suffix 原文件路径
      * @return 图片缓存文件
      */
     public File getImageCacheFile(String suffix) {
         String targetDir;
-        if(TextUtils.isEmpty(mTargetDir)){
+        if (TextUtils.isEmpty(mTargetDir)) {
             targetDir = context.getCacheDir().getAbsolutePath();
-        }else{
+        } else {
             targetDir = mTargetDir;
         }
 
@@ -105,14 +110,14 @@ public abstract class BaseEngine implements IEngine {
 //            dirFile.mkdirs();
 //        }
         File file = new File(targetDir);
-        if(!file.exists()){
+        if (!file.exists()) {
             file.mkdirs();
         }
 
         String cacheBuilder = targetDir + "/" +
                 System.currentTimeMillis() +
                 (int) (Math.random() * 1000) +
-                (TextUtils.isEmpty(suffix) ? ".jpg" : "."+suffix);
+                (TextUtils.isEmpty(suffix) ? ".jpg" : "." + suffix);
 
 //        File file = new File(cacheBuilder);
 //        if(!file.exists()){
