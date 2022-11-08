@@ -107,4 +107,9 @@ public class Furniture {
     public void setTargetFile(File targetFile) {
         this.targetFile = targetFile;
     }
+
+    public void reset(){
+        this.srcHeight =SRC_HEIGHT_DEFAULT;
+        this.srcWidth = SRC_WIDTH_DEFAULT;
+    }
 }

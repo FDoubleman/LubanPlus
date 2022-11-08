@@ -65,26 +65,61 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void testQulity() {
-        File srcFile = new File(getExternalFilesDir(null), "test_1.png");
+        File srcFile1 = new File(getExternalFilesDir(null), "test_1.png");
+        File srcFile2 = new File(getExternalFilesDir(null), "test_3.jpeg");
+        File srcFile3 = new File(getExternalFilesDir(null), "test_4.jpg");
         List<File> list = new ArrayList<>();
-        list.add(srcFile);
-        list.add(srcFile);
-        list.add(srcFile);
-        list.add(srcFile);
+        list.add(srcFile1);
+        list.add(srcFile2);
+        list.add(srcFile3);
+        list.add(srcFile3);
 
         //  验证  Alpha 透明度通道 与保持图片格式的 关系
         //  Alpha : true      false
 
-        Furniture furniture = LubanPlus.with(this)
-                .setQuality(80)
-                .setFocusAlpha(false)
-                .get(srcFile.getAbsolutePath());
-        Log.d("fumm", "target path: " + furniture.getTargetAbsolutePath() +
-                "   src file size :"+ furniture.getSrcLength()+
-                "   target file size : "+ furniture.getTargetLenth() );
+//        Furniture furniture = LubanPlus.with(this)
+//                .setQuality(80)
+//                .setNeedLoopCompress(true)
+//                .setFocusAlpha(false)
+//                .get(srcFile.getAbsolutePath());
+//        Log.d("fumm", "target path: " + furniture.getTargetAbsolutePath() +
+//                "   src file size :"+ furniture.getSrcLength()+
+//                "   target file size : "+ furniture.getTargetLenth() );
 
+//        List<Furniture> listFurn = LubanPlus.with(this)
+//                .load(list)
+//                .setNeedLoopCompress(true)
+//                .get();
+        LubanPlus.with(this)
+                .load(list)
+                .setNeedLoopCompress(true)
+                .setCompressListener(new ICompressListener() {
+                    @Override
+                    public void onStart() {
+                        Log.d("Luban", "onStart");
+                    }
 
-//        for (int i = 0; i < list.size(); i++) {
+                    @Override
+                    public void onSuccess(Furniture furniture) {
+                        Log.d("fumm", "target path: " + furniture.getTargetAbsolutePath() +
+                                "   src file size :" + furniture.getSrcLength() +
+                                "   target file size : " + furniture.getTargetLenth());
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.d("Luban", "onStart e :" + e.toString());
+                    }
+                })
+                .launch();
+
+//        for (Furniture furniture : listFurn) {
+//            Log.d("fumm", "target path: " + furniture.getTargetAbsolutePath() +
+//                    "   src file size :" + furniture.getSrcLength() +
+//                    "   target file size : " + furniture.getTargetLenth());
+//        }
+
+//        for (int i = 0; i < listFurn.size(); i++) {
 //            Furniture furniture = LubanPlus.with(this)
 //                    .setQuality(100 - (10 * i))
 //                    .setFocusAlpha(false)

@@ -1,6 +1,7 @@
 package cn.xdf.lubanplus;
 
 import android.text.TextUtils;
+import android.util.Log;
 
 import java.io.File;
 import java.util.Arrays;
@@ -99,9 +100,11 @@ public class Checker {
 
         File source = new File(path);
         // 2、指定压缩大小是否满足
-        if (!(source.length() > ((long) ignoreCompressSize << 10))) {
+        if ((source.length() <= ((long) ignoreCompressSize << 10))) {
+            Log.d("fumm ","needContinuePress : 不需要压缩");
             return false;
         }
+        Log.d("fumm ","needContinuePress : 需要压缩");
         return true;
     }
 

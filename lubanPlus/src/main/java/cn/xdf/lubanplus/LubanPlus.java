@@ -46,6 +46,7 @@ public class LubanPlus implements Handler.Callback {
     private List<Furniture> mFurnitureList;
 
     private int mIgnoreCompressSize;
+    private boolean mNeedLoopCompress =false;
     private ICompressListener mCompressListener;
     private IFilterListener mFilterListener;
     private BaseEngine mEngine;
@@ -57,6 +58,7 @@ public class LubanPlus implements Handler.Callback {
     private LubanPlus(Builder builder) {
         this.mFurnitureList = builder.mFurnitureList;
         this.mIgnoreCompressSize = builder.mIgnoreCompressSize;
+        this.mNeedLoopCompress = builder.mNeedLoopCompress;
         this.mFilterListener = builder.mFilterListener;
 
         this.mEngine = builder.mEngine;
@@ -84,8 +86,10 @@ public class LubanPlus implements Handler.Callback {
         // 是否需要压缩
         if (Checker.needCompress(mIgnoreCompressSize, path, mFilterListener)) {
             // 压缩图片
-            File beforeFile = new File(path);
-            return mEngine.compress(new Furniture(beforeFile));
+            Furniture beforeFurn = new Furniture(new File(path));
+            // Furniture afterFurn = loopCompress(beforeFurn);
+
+            return loopCompress(beforeFurn);
         }
         Log.d("LuBanPlus", "get path is error! path:" + path);
         return null;
@@ -107,7 +111,7 @@ public class LubanPlus implements Handler.Callback {
                     beforeFur.getSrcAbsolutePath(),
                     mFilterListener)) {
                 // 压缩图片
-                Furniture afterFur = mEngine.compress(beforeFur);
+                Furniture afterFur = loopCompress(beforeFur);;
                 furnitureList.add(afterFur);
             } else {
                 furnitureList.add(beforeFur);
@@ -140,7 +144,7 @@ public class LubanPlus implements Handler.Callback {
             public void run() {
                 try {
                     mHandler.sendMessage(mHandler.obtainMessage(MSG_COMPRESS_START));
-                    Furniture furn = mEngine.compress(beforeFurn);
+                    Furniture furn = loopCompress(beforeFurn);
                     Log.d("run", "Thread name :" + Thread.currentThread().getName());
                     mHandler.sendMessage(mHandler.obtainMessage(MSG_COMPRESS_SUCCESS, furn));
                 } catch (Exception e) {
@@ -169,17 +173,32 @@ public class LubanPlus implements Handler.Callback {
 
     /**
      * 循环压缩图片到指定大小
+     *
      * @param beforeFurn beforeFurn
      * @return Furniture
      */
     private Furniture loopCompress(Furniture beforeFurn) {
-
         Furniture furn = mEngine.compress(beforeFurn);
+        if(!mNeedLoopCompress){
+            return furn;
+        }
+        File src = furn.getSrcFile();
+        Log.d("fumm", "loopCompress: " + furn.getTargetLenth());
         while (Checker.needContinuePress(mIgnoreCompressSize,
                 furn.getTargetAbsolutePath())) {
             // 继续压缩
-             furn = mEngine.compress(beforeFurn);
+            Furniture furniture = new Furniture(furn.getTargetFile());
+            furn = mEngine.compress(furniture);
+            // 采样率压缩到极致 终止压缩
+            if (furn.getTargetLenth() / 1024
+                    == furn.getSrcLength() / 1024) {
+                break;
+            }
+            Log.d("fumm", "loopCompress: " + furn.getTargetLenth());
         }
+        // 设置源文件
+        furn.setSrcFile(src);
+        furn.reset();
         return furn;
     }
 
@@ -194,6 +213,7 @@ public class LubanPlus implements Handler.Callback {
         private int mIgnoreCompressSize = 100;
         private boolean mFocusAlpha = true;
         private int mQuality = 80;
+        private boolean mNeedLoopCompress =false;
 
         private ICompressListener mCompressListener;
         private IFilterListener mFilterListener;
@@ -274,6 +294,12 @@ public class LubanPlus implements Handler.Callback {
                 throw new IllegalArgumentException();
             }
             mQuality = quality;
+            return this;
+        }
+
+        @Override
+        public IBuilder setNeedLoopCompress(boolean need) {
+            this.mNeedLoopCompress = need;
             return this;
         }
 

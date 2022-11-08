@@ -58,6 +58,12 @@ public interface IBuilder {
     IBuilder setQuality(int quality);
 
     /**
+     * 设置是否需要 循环极致压缩到 最小值
+     * @param need true：需要
+     * @return IBuilder
+     */
+    IBuilder setNeedLoopCompress(boolean need);
+    /**
      * 同步方法 压缩单个文件方法
      *
      * @param path 单个文件路径
