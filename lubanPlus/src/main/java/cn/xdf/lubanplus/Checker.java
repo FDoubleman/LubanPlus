@@ -1,5 +1,6 @@
 package cn.xdf.lubanplus;
 
+import android.graphics.BitmapFactory;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -14,8 +15,9 @@ import java.util.Arrays;
 public class Checker {
 
     private static final String TAG = "LubanPlus";
-
+    private static final String REAL_JPG_FORMAT = "image/jpeg";
     private static final String JPG = "jpg";
+
     private static final String PNG = "png";
     private static final String JPEG = "jpeg";
     private static final String DOT = ".";
@@ -23,14 +25,18 @@ public class Checker {
     private static final String[] SUPPORT_IMAGE_FORMAT = new String[]{PNG, JPG, JPEG};
 
     /**
-     * 图片JPEG类型
+     * 图片JPEG类型 jpg or jpeg
      *
      * @param file file 文件
-     * @return true:是JPEG类型
+     * @return true:是 Jpg or JPEG类型
      */
     public static boolean isJPG(File file) {
-
-        return JPG.equals(getSuffix(file));
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(file.getAbsolutePath(), options);
+        String type = options.outMimeType;
+        Log.d("isJPG", "真正的图片格式" + type);
+        return REAL_JPG_FORMAT.equalsIgnoreCase(type);
     }
 
     /**
@@ -101,10 +107,10 @@ public class Checker {
         File source = new File(path);
         // 2、指定压缩大小是否满足
         if ((source.length() <= ((long) ignoreCompressSize << 10))) {
-            Log.d("fumm ","needContinuePress : 不需要压缩");
+            Log.d("fumm ", "needContinuePress : 不需要压缩");
             return false;
         }
-        Log.d("fumm ","needContinuePress : 需要压缩");
+        Log.d("fumm ", "needContinuePress : 需要压缩");
         return true;
     }
 

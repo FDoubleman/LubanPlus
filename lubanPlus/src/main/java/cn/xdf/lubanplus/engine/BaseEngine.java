@@ -4,8 +4,10 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.media.ExifInterface;
 import android.os.Environment;
 import android.text.TextUtils;
+import android.util.Log;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -24,7 +26,7 @@ public abstract class BaseEngine implements IEngine {
     protected Context context;
     protected String mTargetDir;
     protected boolean mFocusAlpha = true;
-    protected int mQuality ;
+    protected int mQuality;
 
 
     private BaseEngine() {
@@ -78,12 +80,44 @@ public abstract class BaseEngine implements IEngine {
         }
     }
 
+    /**
+     * bitmap 旋转 angle 度 图片
+     * @param bitmap bitmap
+     * @param angle angle
+     * @return Bitmap
+     */
     protected Bitmap rotatingImage(Bitmap bitmap, int angle) {
         Matrix matrix = new Matrix();
-
         matrix.postRotate(angle);
+        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(),
+                bitmap.getHeight(), matrix, true);
+    }
 
-        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+    /**
+     * 获取图片角度
+     * @param fileAbsolutePath file AbsolutePath
+     * @return 角度
+     */
+    protected int getOrientation(String fileAbsolutePath) {
+        try {
+            Log.d("getOrientation","fileAbsolutePath: " + fileAbsolutePath);
+            ExifInterface exif = new ExifInterface(fileAbsolutePath);
+            int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION,
+                    ExifInterface.ORIENTATION_NORMAL);
+            switch (orientation) {
+                case ExifInterface.ORIENTATION_ROTATE_90:
+                    return 90;
+                case ExifInterface.ORIENTATION_ROTATE_180:
+                    return 180;
+                case ExifInterface.ORIENTATION_ROTATE_270:
+                    return 270;
+                default:
+                    return 0;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return 0;
     }
 
 

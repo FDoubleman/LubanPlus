@@ -93,6 +93,7 @@ public class MainActivity extends AppCompatActivity {
         LubanPlus.with(this)
                 .load(list)
                 .setNeedLoopCompress(true)
+                .setFocusAlpha(true)
                 .setCompressListener(new ICompressListener() {
                     @Override
                     public void onStart() {
