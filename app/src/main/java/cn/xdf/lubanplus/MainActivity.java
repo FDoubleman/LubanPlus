@@ -21,6 +21,8 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+import cn.xdf.lubanplus.compress.IImageCompressListener;
+import cn.xdf.lubanplus.compress.ImageCompress;
 import cn.xdf.lubanplus.databinding.ActivityMainBinding;
 
 import android.view.Menu;
@@ -54,25 +56,80 @@ public class MainActivity extends AppCompatActivity {
         binding.fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                testCompressImage();
 //                createTestImageFile();
-                testQulity();
+//                testQulity();
 //                getImageCacheFile("png");
 //                File file = new File(getExternalFilesDir(null), "test_2.png");
-                Log.d("fmm", "createTestImageFile");
+//                Log.d("fmm", "createTestImageFile");
             }
         });
         initPermission();
     }
 
+
+    public void testCompressImage() {
+        File srcFile1 = new File(getExternalFilesDir(null), "test_1.png");
+        File srcFile2 = new File(getExternalFilesDir(null), "test_2.jpeg");
+//        File srcFile3 = new File(getExternalFilesDir(null), "test_4.jpg");
+        List<String> paths = new ArrayList<>();
+        paths.add(srcFile1.getAbsolutePath());
+        paths.add(srcFile2.getAbsolutePath());
+
+        paths.add(srcFile1.getAbsolutePath());
+        paths.add(srcFile2.getAbsolutePath());
+        paths.add(srcFile1.getAbsolutePath());
+        paths.add(srcFile2.getAbsolutePath());
+
+//        paths.add(srcFile3.getAbsolutePath());
+
+
+        ImageCompress.compress(getApplication(),
+                paths, 1000, true, new IImageCompressListener() {
+                    @Override
+                    public void onStart(String filePath) {
+                        Log.d("fmm", "onstar : path --> " + filePath);
+                    }
+
+                    @Override
+                    public void onFinish(File file) {
+                        Log.d("fmm", "onFinish : path --> " + file.getAbsolutePath());
+                    }
+
+                    @Override
+                    public void onError(String filePath, Exception exception) {
+                        Log.d("fmm", "onError : path --> " + filePath);
+                    }
+
+                    @Override
+                    public void onEnd(List<File> files) {
+                        Log.d("fmm", "onEnd : size --> " + files.size());
+                    }
+                });
+
+
+    }
+
+    public void testCountDownLatch() {
+        Log.d("testCountDownLatch", "start !!!");
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                CountDownLatchUtils.testExecutor();
+            }
+        }).start();
+        Log.d("testCountDownLatch", "end !!!");
+    }
+
     private void testQulity() {
         File srcFile1 = new File(getExternalFilesDir(null), "test_1.png");
-        File srcFile2 = new File(getExternalFilesDir(null), "test_3.jpeg");
-        File srcFile3 = new File(getExternalFilesDir(null), "test_4.jpg");
+        File srcFile2 = new File(getExternalFilesDir(null), "test_2.jpeg");
+//        File srcFile3 = new File(getExternalFilesDir(null), "test_4.jpg");
         List<File> list = new ArrayList<>();
         list.add(srcFile1);
         list.add(srcFile2);
-        list.add(srcFile3);
-        list.add(srcFile3);
+//        list.add(srcFile3);
+//        list.add(srcFile3);
 
         //  验证  Alpha 透明度通道 与保持图片格式的 关系
         //  Alpha : true      false
@@ -93,7 +150,7 @@ public class MainActivity extends AppCompatActivity {
         LubanPlus.with(this)
                 .load(list)
                 .setNeedLoopCompress(true)
-                .setFocusAlpha(true)
+                .setFocusAlpha(false)
                 .setCompressListener(new ICompressListener() {
                     @Override
                     public void onStart() {
@@ -207,9 +264,10 @@ public class MainActivity extends AppCompatActivity {
     public void createTestImageFile() {
         InputStream is = null;
         try {
-            is = getResources().getAssets().open("test_1.png");
-            File file = new File(getExternalFilesDir(null), "test_1.png");
-
+            is = getResources().getAssets().open("test_2.jpeg");
+            File file = new File(getExternalFilesDir(null), "test_2.jpeg");
+            Log.d("createTestImageFile", "file path: "
+                    + file.getAbsolutePath());
             FileOutputStream fos = new FileOutputStream(file);
 
             byte[] buffer = new byte[2048];
