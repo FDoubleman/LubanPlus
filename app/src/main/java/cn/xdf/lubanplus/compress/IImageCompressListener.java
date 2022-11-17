@@ -1,6 +1,7 @@
 package cn.xdf.lubanplus.compress;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
 
 public interface IImageCompressListener {
@@ -31,5 +32,5 @@ public interface IImageCompressListener {
      *
      * @param files 压缩后 文件集合
      */
-    void onEnd(List<File> files);
+    void onEnd(HashMap<String,File> files);
 }

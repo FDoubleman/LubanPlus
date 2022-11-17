@@ -23,6 +23,7 @@ import androidx.navigation.ui.NavigationUI;
 
 import cn.xdf.lubanplus.compress.IImageCompressListener;
 import cn.xdf.lubanplus.compress.ImageCompress;
+import cn.xdf.lubanplus.compress.ImageCompressListenerImp;
 import cn.xdf.lubanplus.databinding.ActivityMainBinding;
 
 import android.view.Menu;
@@ -33,6 +34,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -102,12 +104,17 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     @Override
-                    public void onEnd(List<File> files) {
+                    public void onEnd(HashMap<String,File> files) {
                         Log.d("fmm", "onEnd : size --> " + files.size());
                     }
                 });
-
-
+//        ImageCompress.compress(getApplication(),paths,1000,true,
+//                new ImageCompressListenerImp(){
+//            @Override
+//            public void onEnd(HashMap<String, File> files) {
+//                super.onEnd(files);
+//            }
+//        });
     }
 
     public void testCountDownLatch() {

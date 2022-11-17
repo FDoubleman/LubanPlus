@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -25,7 +26,7 @@ import java.util.concurrent.Executors;
  */
 public class ImageCompress {
 
-    private static Executor sExecutors = Executors.newFixedThreadPool(3);
+    private static final Executor sExecutors = Executors.newFixedThreadPool(3);
     public static final int MSG_COMPRESS_START = 0;
     public static final int MSG_COMPRESS_FINISH = 1;
     public static final int MSG_COMPRESS_END = 2;
@@ -34,18 +35,17 @@ public class ImageCompress {
 
     public static File compress(Context context, String filePath,
                                 int ignoreSize, boolean focusAlpha) {
-
-        return null;
+        return CompressTask.realCompress(context, filePath, ignoreSize, focusAlpha);
     }
 
     public static void compress(Context context, List<String> filePaths,
-                                IImageCompressListener listener){
-
+                                IImageCompressListener listener) {
+        compress(context, filePaths, 100, listener);
     }
 
     public static void compress(Context context, List<String> filePaths, int ignoreSize,
-                                IImageCompressListener listener){
-
+                                IImageCompressListener listener) {
+        compress(context, filePaths, ignoreSize, false, listener);
     }
 
     public static void compress(Context context, List<String> filePaths, int ignoreSize,
@@ -61,7 +61,7 @@ public class ImageCompress {
         Iterator<String> iterator = filePaths.iterator();
         while (iterator.hasNext()) {
             String path = iterator.next();
-            sExecutors.execute(new CompressTask(context, path, ignoreSize, focusAlpha, latch, handler));
+            sExecutors.execute(new CompressTask(context, new CompressInfo(path), ignoreSize, focusAlpha, latch, handler));
             iterator.remove();
         }
     }
@@ -70,11 +70,11 @@ public class ImageCompress {
     private static class HandlerCall implements Handler.Callback {
 
         private IImageCompressListener mListener;
-        private List<File> mFiles;
+        private HashMap<String,File> mFiles;
 
         public HandlerCall(IImageCompressListener listener) {
             this.mListener = listener;
-            this.mFiles = new ArrayList<>();
+            this.mFiles = new HashMap<>();
         }
 
         @Override
@@ -84,21 +84,23 @@ public class ImageCompress {
                     mListener.onStart((String) message.obj);
                     break;
                 case MSG_COMPRESS_FINISH:
-                    File file = (File) message.obj;
-                    mListener.onFinish((File) message.obj);
-                    mFiles.add(file);
+                    CompressInfo compressInfo = (CompressInfo) message.obj;
+                    mListener.onFinish(compressInfo.getTarget());
+
+                    mFiles.put(compressInfo.getSrcPath(),compressInfo.getTarget());
                     break;
                 case MSG_COMPRESS_END:
                     mListener.onEnd(mFiles);
                     break;
                 case MSG_COMPRESS_ERROR:
-                    mFiles.add(null);
-                    mListener.onError(null, (Exception) message.obj);
+                    CompressInfo compress = (CompressInfo) message.obj;
+                    mFiles.put(compress.getSrcPath(),null);
+                    mListener.onError(compress.getSrcPath(), new Exception("compress image error !"));
+                    break;
+                default:
                     break;
             }
             return false;
         }
     }
-
-
 }
