@@ -18,8 +18,8 @@ import cn.xdf.lubanplus.Furniture;
 /**
  * author:fumm
  * Date : 2022/ 10/ 31 15:09
- * Dec : 图片压缩引擎 ,
- * 图片压缩可能使用到的通用 公共方法  ，位于此
+ * Dec : 图片压缩基础引擎 ,
+ *       图片压缩可能使用到的通用 公共方法  ，位于此
  **/
 public abstract class BaseEngine implements IEngine {
     private static final String sCacheFileDirName = "LuBanPlus";
@@ -29,11 +29,8 @@ public abstract class BaseEngine implements IEngine {
     protected int mQuality;
 
 
-    private BaseEngine() {
-    }
-
     public BaseEngine(Context context) {
-        this.context = context;
+        this.context = context.getApplicationContext();
     }
 
     @Override
