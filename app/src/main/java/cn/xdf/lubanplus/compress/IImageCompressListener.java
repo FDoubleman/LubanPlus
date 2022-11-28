@@ -2,7 +2,6 @@ package cn.xdf.lubanplus.compress;
 
 import java.io.File;
 import java.util.HashMap;
-import java.util.List;
 
 public interface IImageCompressListener {
 

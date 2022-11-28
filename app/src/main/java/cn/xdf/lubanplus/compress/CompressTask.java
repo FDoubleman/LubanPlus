@@ -1,6 +1,8 @@
 package cn.xdf.lubanplus.compress;
 
 
+
+
 import static cn.xdf.lubanplus.compress.ImageCompress.MSG_COMPRESS_END;
 import static cn.xdf.lubanplus.compress.ImageCompress.MSG_COMPRESS_ERROR;
 import static cn.xdf.lubanplus.compress.ImageCompress.MSG_COMPRESS_FINISH;
@@ -42,11 +44,12 @@ public class CompressTask implements Runnable {
             String path = mCompressInfo.getSrcPath();
             mHandler.sendMessage(mHandler.obtainMessage(MSG_COMPRESS_START,path));
             Log.d("Task", "thread : " + Thread.currentThread().getName());
-            File file = realCompress(mContext, path, mIgnoreSize, mFocusAlpha);
+            File file = compress(mContext, path, mIgnoreSize, mFocusAlpha);
             mCompressInfo.setTarget(file);
             mHandler.sendMessage(mHandler.obtainMessage(MSG_COMPRESS_FINISH, mCompressInfo));
         } catch (Exception exception) {
             exception.printStackTrace();
+            mCompressInfo.setException(exception);
             mHandler.sendMessage(mHandler.obtainMessage(MSG_COMPRESS_ERROR, mCompressInfo));
         } finally {
             mLatch.countDown();
@@ -58,7 +61,7 @@ public class CompressTask implements Runnable {
     }
 
 
-    public static File realCompress(Context context, String filePath,
+    public static File compress(Context context, String filePath,
                              int ignoreSize, boolean focusAlpha) {
         try {
             return Luban.with(context)

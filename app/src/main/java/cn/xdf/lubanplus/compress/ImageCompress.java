@@ -20,9 +20,11 @@ import java.util.concurrent.Executors;
  * @author fmm
  * @time 2022/11/14
  * @desc 图片压缩工具类
- * 主要对图片压缩工具进行 封装 七功能如下：
+ * 主要对图片压缩工具进行 封装 其功能如下：
  * 1、基于鲁班压缩功能 ，并能现实鲁班所有功能
  * 2、多线程并发压缩 ，并返回结果
+ * 3、异常功能捕获
+ *
  */
 public class ImageCompress {
 
@@ -32,23 +34,80 @@ public class ImageCompress {
     public static final int MSG_COMPRESS_END = 2;
     public static final int MSG_COMPRESS_ERROR = 3;
 
+    /**
+     * 同步压缩图片
+     * @param context context
+     * @param filePath 图片路径
+     * @param ignoreSize 忽略图片过滤大小
+     * @return 压缩后的图片文件
+     */
+    public static File compress(Context context, String filePath,
+                                int ignoreSize) {
+        return CompressTask.compress(context, filePath, ignoreSize, true);
+    }
 
+    /**
+     * 同步压缩图片
+     * @param context context
+     * @param filePath 图片路径
+     * @param ignoreSize 忽略图片过滤大小
+     * @param focusAlpha 是否保留透明通道 ，默认 true :保留
+     * @return 压缩后的图片文件
+     */
     public static File compress(Context context, String filePath,
                                 int ignoreSize, boolean focusAlpha) {
-        return CompressTask.realCompress(context, filePath, ignoreSize, focusAlpha);
+        return CompressTask.compress(context, filePath, ignoreSize, focusAlpha);
     }
 
-    public static void compress(Context context, List<String> filePaths,
+    /**
+     * 异步获取压缩图片
+     * @param context context
+     * @param filePath 图片路径
+     * @param ignoreSize 忽略大小
+     * @param listener 压缩图片回调，默认 实现类 ImageCompressListenerImp
+     */
+    public static void compressAsy(Context context, String filePath, int ignoreSize,
                                 IImageCompressListener listener) {
-        compress(context, filePaths, 100, listener);
+        List<String> filePaths = new ArrayList<>();
+        filePaths.add(filePath);
+        compressAsy(context, filePaths, ignoreSize,true, listener);
     }
 
-    public static void compress(Context context, List<String> filePaths, int ignoreSize,
-                                IImageCompressListener listener) {
-        compress(context, filePaths, ignoreSize, false, listener);
+    /**
+     * 异步获取压缩图片
+     * @param context context
+     * @param filePaths 图片路径
+     * @param ignoreSize 忽略大小
+     * @param listener 压缩图片回调，默认 实现类 ImageCompressListenerImp
+     */
+    public static void compressAsy(Context context,  List<String> filePaths, int ignoreSize,
+                                   IImageCompressListener listener) {
+        compressAsy(context, filePaths, ignoreSize,true, listener);
     }
 
-    public static void compress(Context context, List<String> filePaths, int ignoreSize,
+    /**
+     * 异步获取压缩图片
+     * @param context context
+     * @param filePaths 图片路径 集合
+     * @param ignoreSize 忽略大小
+     * @param focusAlpha 是否保留透明通道 ，默认 true :保留
+     * @param listener 压缩图片回调，默认 实现类 ImageCompressListenerImp
+     */
+    public static void compressAsy(Context context, List<String> filePaths, int ignoreSize,
+                                   boolean focusAlpha, IImageCompressListener listener) {
+        handlerCompress(context, filePaths, ignoreSize, focusAlpha, listener);
+    }
+
+    /**
+     *
+     * 异步获取压缩图片
+     * @param context context
+     * @param filePaths 图片路径 集合
+     * @param ignoreSize 忽略大小
+     * @param focusAlpha 是否保留透明通道 ，默认 true :保留
+     * @param listener 压缩图片回调，默认 实现类 ImageCompressListenerImp
+     */
+    private static void handlerCompress(Context context, List<String> filePaths, int ignoreSize,
                                 boolean focusAlpha, IImageCompressListener listener) {
         if (filePaths == null) {
             listener.onError("", new NullPointerException());
@@ -70,7 +129,7 @@ public class ImageCompress {
     private static class HandlerCall implements Handler.Callback {
 
         private IImageCompressListener mListener;
-        private HashMap<String,File> mFiles;
+        private HashMap<String, File> mFiles;
 
         public HandlerCall(IImageCompressListener listener) {
             this.mListener = listener;
@@ -87,15 +146,15 @@ public class ImageCompress {
                     CompressInfo compressInfo = (CompressInfo) message.obj;
                     mListener.onFinish(compressInfo.getTarget());
 
-                    mFiles.put(compressInfo.getSrcPath(),compressInfo.getTarget());
+                    mFiles.put(compressInfo.getSrcPath(), compressInfo.getTarget());
                     break;
                 case MSG_COMPRESS_END:
                     mListener.onEnd(mFiles);
                     break;
                 case MSG_COMPRESS_ERROR:
                     CompressInfo compress = (CompressInfo) message.obj;
-                    mFiles.put(compress.getSrcPath(),null);
-                    mListener.onError(compress.getSrcPath(), new Exception("compress image error !"));
+                    mFiles.put(compress.getSrcPath(), null);
+                    mListener.onError(compress.getSrcPath(), compress.getException());
                     break;
                 default:
                     break;

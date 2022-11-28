@@ -17,6 +17,11 @@ public class CompressInfo {
      */
     private File target;
 
+    /**
+     * 异常信息
+     */
+    private Exception exception;
+
     public CompressInfo(String srcPath) {
         this.srcPath = srcPath;
     }
@@ -35,5 +40,13 @@ public class CompressInfo {
 
     public void setTarget(File target) {
         this.target = target;
+    }
+
+    public Exception getException() {
+        return exception;
+    }
+
+    public void setException(Exception exception) {
+        this.exception = exception;
     }
 }
