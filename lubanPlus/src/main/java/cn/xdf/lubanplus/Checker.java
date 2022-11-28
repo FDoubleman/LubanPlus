@@ -17,7 +17,6 @@ public class Checker {
     private static final String TAG = "LubanPlus";
     private static final String REAL_JPG_FORMAT = "image/jpeg";
     private static final String JPG = "jpg";
-
     private static final String PNG = "png";
     private static final String JPEG = "jpeg";
     private static final String DOT = ".";

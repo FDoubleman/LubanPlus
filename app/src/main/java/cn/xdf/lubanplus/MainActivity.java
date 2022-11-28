@@ -171,15 +171,15 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     @Override
-                    public void onSuccess(Furniture furniture) {
-                        Log.d("fumm", "target path: " + furniture.getTargetAbsolutePath() +
-                                "   src file size :" + furniture.getSrcLength() +
-                                "   target file size : " + furniture.getTargetLenth());
+                    public void onSuccess(String srcPath, String compressPath) {
+                        Log.d("fumm", "srcPath path: " + srcPath +
+                                "   compressPath file size :" + compressPath);
                     }
 
                     @Override
-                    public void onError(Throwable e) {
-                        Log.d("Luban", "onStart e :" + e.toString());
+                    public void onError(String srcPath, Exception exception) {
+                        Log.d("Luban", "onError srcPath :" + srcPath +
+                                " -- exception : "+exception.toString());
                     }
 
                     @Override
@@ -257,18 +257,20 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     @Override
-                    public void onSuccess(Furniture furn) {
-                        Log.d("Luban", "onSuccess file targetDir: " + furn.getTargetAbsolutePath());
+                    public void onSuccess(String srcPath, String compressPath) {
+                        Log.d("fumm", "srcPath path: " + srcPath +
+                                "   compressPath file size :" + compressPath);
                     }
 
                     @Override
-                    public void onError(Throwable e) {
-                        Log.d("Luban", "onStart e :" + e.toString());
+                    public void onError(String srcPath, Exception exception) {
+                        Log.d("Luban", "onError srcPath :" + srcPath +
+                                " -- exception : "+exception.toString());
                     }
 
                     @Override
                     public void onEnd(Map<String, String> resultMap) {
-                        Log.d("Luban", "onEnd  :" + resultMap.size());
+                        Log.d("fumm", "onEnd : " + resultMap.size());
                     }
                 }).setFilterListener(new IFilterListener() {
                     @Override

@@ -43,6 +43,11 @@ public class Furniture {
 
     private int srcHeight = SRC_HEIGHT_DEFAULT;
 
+    /**
+     * 压缩异常时回调
+     */
+    private Exception exception;
+
     public Furniture(File srcFile){
         this.srcFile = srcFile;
     }
@@ -157,5 +162,13 @@ public class Furniture {
 
     public void setQuality(int quality) {
         this.quality = quality;
+    }
+
+    public Exception getException() {
+        return exception;
+    }
+
+    public void setException(Exception exception) {
+        this.exception = exception;
     }
 }

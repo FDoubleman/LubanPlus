@@ -78,7 +78,7 @@ public class LubanPlus {
         if (Checker.needCompress(mIgnoreCompressSize, path, mFilterListener)) {
             // 压缩图片
             Furniture beforeFurn = new Furniture(new File(path),
-                    mBuilder.mTargetDir,mBuilder.mFocusAlpha,mBuilder.mQuality);
+                    mBuilder.mTargetDir, mBuilder.mFocusAlpha, mBuilder.mQuality);
             return new SampleEngine(mBuilder.mContext).compress(beforeFurn);
         }
         Log.d("LuBanPlus", "get path is error! path:" + path);
@@ -171,14 +171,18 @@ public class LubanPlus {
                     break;
                 case MSG_COMPRESS_SUCCESS:
                     Furniture succ = (Furniture) message.obj;
-                    mCompressListener.onSuccess(succ);
-                    mResult.put(succ.getSrcAbsolutePath(), succ.getTargetAbsolutePath());
+                    String srcPath = succ.getSrcAbsolutePath();
+                    String targetPath = succ.getTargetAbsolutePath();
+
+                    mCompressListener.onSuccess(srcPath, targetPath);
+                    mResult.put(srcPath, targetPath);
                     break;
                 case MSG_COMPRESS_END:
                     mCompressListener.onEnd(mResult);
                     break;
                 case MSG_COMPRESS_ERROR:
-                    mCompressListener.onError((Throwable) message.obj);
+                    Furniture err = (Furniture) message.obj;
+                    mCompressListener.onError(err.getSrcAbsolutePath(), err.getException());
                     break;
                 default:
                     break;

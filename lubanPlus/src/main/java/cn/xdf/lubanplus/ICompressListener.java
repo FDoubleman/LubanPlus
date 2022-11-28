@@ -11,19 +11,28 @@ import java.util.Map;
 public interface ICompressListener {
 
     /**
-     * Fired when the compression is started, override to handle in your own code
+     * 图片压缩开始时回调
+     * @param srcPath 原始图片路径
      */
-    void onStart(String path);
+    void onStart(String srcPath);
 
     /**
-     * Fired when a compression returns successfully, override to handle in your own code
+     * 图片压缩成功后的回调
+     * @param srcPath 原始图片路径
+     * @param compressPath 压缩图片后的路径
      */
-    void onSuccess(Furniture furn);
+    void onSuccess(String srcPath,String compressPath);
 
     /**
-     * Fired when a compression fails to complete, override to handle in your own code
+     * 图片压缩时 发生错误的回调
+     * @param srcPath srcPath
+     * @param exception exception
      */
-    void onError(Throwable e);
+    void onError(String srcPath,Exception exception);
 
+    /**
+     * 图片list全部压缩完成之后的回调
+     * @param resultMap 压缩结果
+     */
     void onEnd(Map<String,String> resultMap);
 }

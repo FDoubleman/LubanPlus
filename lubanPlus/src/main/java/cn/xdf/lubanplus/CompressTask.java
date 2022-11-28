@@ -9,6 +9,7 @@ import android.content.Context;
 import android.os.Handler;
 import android.util.Log;
 
+import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
 
 import cn.xdf.lubanplus.engine.SampleEngine;
@@ -35,11 +36,16 @@ public class CompressTask implements Runnable {
         try {
             mHandler.sendMessage(mHandler.obtainMessage(MSG_COMPRESS_START, mFurn));
             Furniture furn = compress(mContext, mFurn);
-            Log.d("run", "Thread name :" + Thread.currentThread().getName());
-            mHandler.sendMessage(mHandler.obtainMessage(MSG_COMPRESS_SUCCESS, furn));
+            if (furn.getTargetFile() == null) {
+                mFurn.setException(new IOException("LuBanPlus compress Image IO Exception!"));
+                mHandler.sendMessage(mHandler.obtainMessage(MSG_COMPRESS_ERROR, mFurn));
+            } else {
+                mHandler.sendMessage(mHandler.obtainMessage(MSG_COMPRESS_SUCCESS, furn));
+            }
         } catch (Exception e) {
             e.printStackTrace();
-            mHandler.sendMessage(mHandler.obtainMessage(MSG_COMPRESS_ERROR, e));
+            mFurn.setException(e);
+            mHandler.sendMessage(mHandler.obtainMessage(MSG_COMPRESS_ERROR, mFurn));
         } finally {
             mCountDown.countDown();
             if (mCountDown.getCount() == 0) {
@@ -54,6 +60,7 @@ public class CompressTask implements Runnable {
 
 
     private SampleEngine getEngine(Context context) {
+        // TODO 使用ThreadLocal 处理
         return new SampleEngine(context);
     }
 }
