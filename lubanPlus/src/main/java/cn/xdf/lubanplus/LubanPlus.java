@@ -13,8 +13,10 @@ import androidx.annotation.NonNull;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -26,39 +28,38 @@ import cn.xdf.lubanplus.engine.SampleEngine;
  * Date : 2022/ 10/ 28 14:19
  * Dec : 鲁班plus
  **/
-public class LubanPlus implements Handler.Callback {
+public class LubanPlus {
     private static final String sCacheFileDirName = "LuBanPlus";
-    private static final int MSG_COMPRESS_SUCCESS = 0;
-    private static final int MSG_COMPRESS_START = 1;
-    private static final int MSG_COMPRESS_ERROR = 2;
+
+    public static final int MSG_COMPRESS_START = 0;
+    public static final int MSG_COMPRESS_SUCCESS = 1;
+    public static final int MSG_COMPRESS_ERROR = 2;
+    public static final int MSG_COMPRESS_END = 3;
 
     private List<Furniture> mFurnitureList;
 
     private int mIgnoreCompressSize;
     @Deprecated // 暂时loop循环压缩方法 停用
-    private boolean mNeedLoopCompress =false;
+    private boolean mNeedLoopCompress = false;
     private ICompressListener mCompressListener;
     private IFilterListener mFilterListener;
-    private BaseEngine mEngine;
+    private Builder mBuilder;
 
     // TODO 待优化选择
     private Executor mExecutor = Executors.newFixedThreadPool(3);
-    private Handler mHandler;
+
 
     private LubanPlus(Builder builder) {
         this.mFurnitureList = builder.mFurnitureList;
         this.mIgnoreCompressSize = builder.mIgnoreCompressSize;
         this.mNeedLoopCompress = builder.mNeedLoopCompress;
-        this.mFilterListener = builder.mFilterListener;
 
-        this.mEngine = builder.mEngine;
-        this.mEngine.setFocusAlpha(builder.mFocusAlpha);
-        this.mEngine.setTargetDir(builder.mTargetDir);
-        this.mEngine.setQuality(builder.mQuality);
+        this.mBuilder = builder;
+
 
         this.mCompressListener = builder.mCompressListener;
         this.mFilterListener = builder.mFilterListener;
-        this.mHandler = new Handler(Looper.getMainLooper(), this);
+
     }
 
 
@@ -76,10 +77,9 @@ public class LubanPlus implements Handler.Callback {
         // 是否需要压缩
         if (Checker.needCompress(mIgnoreCompressSize, path, mFilterListener)) {
             // 压缩图片
-            Furniture beforeFurn = new Furniture(new File(path));
-            // Furniture afterFurn = loopCompress(beforeFurn);
-
-            return compress(beforeFurn);
+            Furniture beforeFurn = new Furniture(new File(path),
+                    mBuilder.mTargetDir,mBuilder.mFocusAlpha,mBuilder.mQuality);
+            return new SampleEngine(mBuilder.mContext).compress(beforeFurn);
         }
         Log.d("LuBanPlus", "get path is error! path:" + path);
         return null;
@@ -96,12 +96,16 @@ public class LubanPlus implements Handler.Callback {
         Iterator<Furniture> iterable = mFurnitureList.iterator();
         while (iterable.hasNext()) {
             Furniture beforeFur = iterable.next();
+            beforeFur.setFocusAlpha(mBuilder.mFocusAlpha);
+            beforeFur.setQuality(mBuilder.mQuality);
+            beforeFur.setTargetDir(mBuilder.mTargetDir);
+
 
             if (Checker.needCompress(mIgnoreCompressSize,
                     beforeFur.getSrcAbsolutePath(),
                     mFilterListener)) {
                 // 压缩图片
-                Furniture afterFur = compress(beforeFur);;
+                Furniture afterFur = new SampleEngine(mBuilder.mContext).compress(beforeFur);
                 furnitureList.add(afterFur);
             } else {
                 furnitureList.add(beforeFur);
@@ -114,51 +118,73 @@ public class LubanPlus implements Handler.Callback {
 
     private void launch() {
         Iterator<Furniture> iterable = mFurnitureList.iterator();
+        Handler handler = new Handler(Looper.getMainLooper(), new HandlerCall(mCompressListener));
+
+        int furnSize = mFurnitureList.size();
+        // 1、检查过滤
         while (iterable.hasNext()) {
             Furniture beforeFurn = iterable.next();
+            beforeFurn.setFocusAlpha(mBuilder.mFocusAlpha);
+            beforeFurn.setQuality(mBuilder.mQuality);
+            beforeFurn.setTargetDir(mBuilder.mTargetDir);
+
             // 压缩前检查
             if (!Checker.needCompress(mIgnoreCompressSize,
                     beforeFurn.getSrcAbsolutePath(),
                     mFilterListener)) {
                 iterable.remove();
-                continue;
+                furnSize--;
             }
-            realLaunch(beforeFurn);
-            iterable.remove();
         }
+        if (furnSize <= 0) {
+            return;
+        }
+        CountDownLatch countDownLatch = new CountDownLatch(furnSize);
+        for (Furniture beforeFurn : mFurnitureList) {
+            realLaunch(beforeFurn, handler, countDownLatch);
+        }
+        mFurnitureList.clear();
     }
 
-    private void realLaunch(Furniture beforeFurn) {
-        AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    mHandler.sendMessage(mHandler.obtainMessage(MSG_COMPRESS_START));
-                    Furniture furn = compress(beforeFurn);
-                    Log.d("run", "Thread name :" + Thread.currentThread().getName());
-                    mHandler.sendMessage(mHandler.obtainMessage(MSG_COMPRESS_SUCCESS, furn));
-                } catch (Exception e) {
-                    mHandler.sendMessage(mHandler.obtainMessage(MSG_COMPRESS_ERROR, e));
-                }
-            }
-        });
+    private void realLaunch(Furniture beforeFurn, Handler handler, CountDownLatch countDownLatch) {
+        mExecutor.execute(new CompressTask(mBuilder.mContext, beforeFurn,
+                handler, countDownLatch));
     }
 
-    @Override
-    public boolean handleMessage(@NonNull Message msg) {
-        if (mCompressListener == null) return false;
-        switch (msg.what) {
-            case MSG_COMPRESS_START:
-                mCompressListener.onStart();
-                break;
-            case MSG_COMPRESS_SUCCESS:
-                mCompressListener.onSuccess((Furniture) msg.obj);
-                break;
-            case MSG_COMPRESS_ERROR:
-                mCompressListener.onError((Throwable) msg.obj);
-                break;
+
+    public static class HandlerCall implements Handler.Callback {
+        private ICompressListener mCompressListener;
+        private HashMap<String, String> mResult;
+
+        public HandlerCall(ICompressListener compressListener) {
+            this.mCompressListener = compressListener;
+            mResult = new HashMap<>();
         }
-        return false;
+
+        @Override
+        public boolean handleMessage(@NonNull Message message) {
+            if (mCompressListener == null) return false;
+            switch (message.what) {
+                case MSG_COMPRESS_START:
+                    Furniture furniture = (Furniture) message.obj;
+                    mCompressListener.onStart(furniture.getSrcAbsolutePath());
+                    break;
+                case MSG_COMPRESS_SUCCESS:
+                    Furniture succ = (Furniture) message.obj;
+                    mCompressListener.onSuccess(succ);
+                    mResult.put(succ.getSrcAbsolutePath(), succ.getTargetAbsolutePath());
+                    break;
+                case MSG_COMPRESS_END:
+                    mCompressListener.onEnd(mResult);
+                    break;
+                case MSG_COMPRESS_ERROR:
+                    mCompressListener.onError((Throwable) message.obj);
+                    break;
+                default:
+                    break;
+            }
+            return false;
+        }
     }
 
     /**
@@ -167,8 +193,8 @@ public class LubanPlus implements Handler.Callback {
      * @param beforeFurn beforeFurn
      * @return Furniture
      */
-    private Furniture compress(Furniture beforeFurn) {
-        Furniture furn = mEngine.compress(beforeFurn);
+//    private Furniture compress(Furniture beforeFurn) {
+//        Furniture furn = mEngine.compress(beforeFurn);
 //        if(!mNeedLoopCompress){
 //            return furn;
 //        }
@@ -189,8 +215,9 @@ public class LubanPlus implements Handler.Callback {
 //        // 设置源文件
 //        furn.setSrcFile(src);
 //        furn.reset();
-        return furn;
-    }
+//        return furn;
+//    }
+
 
     /**
      * 如果想了解 更多的 注释和方法 请 阅读  IBuilder
@@ -204,16 +231,14 @@ public class LubanPlus implements Handler.Callback {
         private boolean mFocusAlpha = true;
         private int mQuality = 80;
         @Deprecated
-        private boolean mNeedLoopCompress =false;
+        private boolean mNeedLoopCompress = false;
 
         private ICompressListener mCompressListener;
         private IFilterListener mFilterListener;
-        private BaseEngine mEngine;
 
         private Builder(Context context) {
             mContext = context;
             mFurnitureList = new ArrayList<>();
-            mEngine = new SampleEngine(context);
         }
 
         public LubanPlus build() {

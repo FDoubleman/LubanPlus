@@ -37,19 +37,22 @@ public class SampleEngine extends BaseEngine {
         // 2、针对jpg or jpeg 格式 需要旋转获取原图
         File srcFile = furni.getSrcFile();
         if (Checker.isJPG(srcFile)) {
-           tagBitmap = rotatingImage(tagBitmap,getOrientation(srcFile.getAbsolutePath()));
+            tagBitmap = rotatingImage(tagBitmap, getOrientation(srcFile.getAbsolutePath()));
         }
         // 3、压缩图片
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         // format : png 格式 保留 Alpha 通道 ，jpeg：格式不支持 Alpha通道
-        // quality : png 设置无效
-        tagBitmap.compress(mFocusAlpha ? Bitmap.CompressFormat.PNG : Bitmap.CompressFormat.JPEG,
-                mQuality, outputStream);
+        // quality : png 设置无效\
+        boolean focusAlpha = furni.isFocusAlpha();
+        int quality = furni.getQuality();
+
+        tagBitmap.compress(focusAlpha ? Bitmap.CompressFormat.PNG : Bitmap.CompressFormat.JPEG,
+                quality, outputStream);
         tagBitmap.recycle();
-        Log.d("fumm compress","mQuality : " +mQuality);
+        Log.d("fumm compress", "mQuality : " + quality);
 
         // 4、outputStream 转换为File
-        File targetFile = getImageCacheFile(Checker.getSuffix(furni.getSrcFile()));
+        File targetFile = getImageCacheFile(furni);
         FileOutputStream fos = null;
         try {
             fos = new FileOutputStream(targetFile);

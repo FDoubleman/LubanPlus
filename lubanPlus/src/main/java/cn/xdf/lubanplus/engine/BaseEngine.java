@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import cn.xdf.lubanplus.Checker;
 import cn.xdf.lubanplus.Furniture;
 
 /**
@@ -24,10 +25,6 @@ import cn.xdf.lubanplus.Furniture;
 public abstract class BaseEngine implements IEngine {
     private static final String sCacheFileDirName = "LuBanPlus";
     protected Context context;
-    protected String mTargetDir;
-    protected boolean mFocusAlpha = true;
-    protected int mQuality;
-
 
     public BaseEngine(Context context) {
         this.context = context.getApplicationContext();
@@ -39,18 +36,6 @@ public abstract class BaseEngine implements IEngine {
     }
 
     public abstract Furniture realCompress(Furniture src);
-
-    public void setTargetDir(String targetDir) {
-        this.mTargetDir = targetDir;
-    }
-
-    public void setFocusAlpha(boolean focusAlpha) {
-        this.mFocusAlpha = focusAlpha;
-    }
-
-    public void setQuality(int quality) {
-        this.mQuality = quality;
-    }
 
     protected int computeSize(int srcWidth, int srcHeight) {
         srcWidth = srcWidth % 2 == 1 ? srcWidth + 1 : srcWidth;
@@ -121,16 +106,14 @@ public abstract class BaseEngine implements IEngine {
     /**
      * 获取图片缓存文件
      *
-     * @param suffix 原文件路径
+     * @param furni 原文件路径
      * @return 图片缓存文件
      */
-    public File getImageCacheFile(String suffix) {
-        String targetDir;
-        if (TextUtils.isEmpty(mTargetDir)) {
-            targetDir = context.getCacheDir().getAbsolutePath();
-        } else {
-            targetDir = mTargetDir;
-        }
+    public File getImageCacheFile(Furniture furni) {
+
+        String suffix = Checker.getSuffix(furni.getSrcFile());
+        String targetDir =furni.getTargetDir(context) ;
+
 
 //        String targetDir = Environment.getDownloadCacheDirectory().getAbsolutePath();
 //        String targetDir = Environment.getDownloadCacheDirectory().getAbsolutePath() +

@@ -1,6 +1,8 @@
 package cn.xdf.lubanplus;
 
+import android.content.Context;
 import android.graphics.BitmapFactory;
+import android.text.TextUtils;
 
 import java.io.File;
 
@@ -22,14 +24,35 @@ public class Furniture {
      */
     private File targetFile;
 
+    /**
+     * 目标文件夹
+     */
+    private String targetDir;
+
+    /**
+     * 设置是否保留图片的Alpha通道
+     */
+    private boolean focusAlpha;
+
+    /**
+     * 设置 图片压缩质量
+     */
+    private int quality;
+
     private int srcWidth = SRC_WIDTH_DEFAULT;
 
     private int srcHeight = SRC_HEIGHT_DEFAULT;
 
-    public Furniture(File srcFile) {
+    public Furniture(File srcFile){
         this.srcFile = srcFile;
     }
 
+    public Furniture(File srcFile, String targetDir, boolean focusAlpha, int quality) {
+        this.srcFile = srcFile;
+        this.targetDir = targetDir;
+        this.focusAlpha = focusAlpha;
+        this.quality = quality;
+    }
 
     /**
      * 获取源图片的宽
@@ -108,8 +131,31 @@ public class Furniture {
         this.targetFile = targetFile;
     }
 
-    public void reset(){
-        this.srcHeight =SRC_HEIGHT_DEFAULT;
-        this.srcWidth = SRC_WIDTH_DEFAULT;
+    public String getTargetDir(Context context) {
+        if (TextUtils.isEmpty(targetDir)) {
+            targetDir = context.getCacheDir().getAbsolutePath();
+        }
+        return targetDir;
+    }
+
+    public void setTargetDir(String targetDir) {
+        this.targetDir = targetDir;
+    }
+
+
+    public boolean isFocusAlpha() {
+        return focusAlpha;
+    }
+
+    public void setFocusAlpha(boolean focusAlpha) {
+        this.focusAlpha = focusAlpha;
+    }
+
+    public int getQuality() {
+        return quality;
+    }
+
+    public void setQuality(int quality) {
+        this.quality = quality;
     }
 }

@@ -1,6 +1,7 @@
 package cn.xdf.lubanplus;
 
 import java.io.File;
+import java.util.Map;
 
 /**
  * author:fumm
@@ -12,7 +13,7 @@ public interface ICompressListener {
     /**
      * Fired when the compression is started, override to handle in your own code
      */
-    void onStart();
+    void onStart(String path);
 
     /**
      * Fired when a compression returns successfully, override to handle in your own code
@@ -23,4 +24,6 @@ public interface ICompressListener {
      * Fired when a compression fails to complete, override to handle in your own code
      */
     void onError(Throwable e);
+
+    void onEnd(Map<String,String> resultMap);
 }

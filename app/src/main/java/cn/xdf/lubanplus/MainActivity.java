@@ -36,6 +36,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -58,9 +59,9 @@ public class MainActivity extends AppCompatActivity {
         binding.fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                testCompressImage();
+//                testCompressImage();
 //                createTestImageFile();
-//                testQulity();
+                testQulity();
 //                getImageCacheFile("png");
 //                File file = new File(getExternalFilesDir(null), "test_2.png");
 //                Log.d("fmm", "createTestImageFile");
@@ -104,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     @Override
-                    public void onEnd(HashMap<String,File> files) {
+                    public void onEnd(HashMap<String, File> files) {
                         Log.d("fmm", "onEnd : size --> " + files.size());
                     }
                 });
@@ -131,12 +132,16 @@ public class MainActivity extends AppCompatActivity {
     private void testQulity() {
         File srcFile1 = new File(getExternalFilesDir(null), "test_1.png");
         File srcFile2 = new File(getExternalFilesDir(null), "test_2.jpeg");
+        File srcFile5 = new File(getExternalFilesDir(null), "test_5.png");
+        File srcFile7 = new File(getExternalFilesDir(null), "test_7.jpg");
+        File srcFile8 = new File(getExternalFilesDir(null), "test_8.jpg");
 //        File srcFile3 = new File(getExternalFilesDir(null), "test_4.jpg");
         List<File> list = new ArrayList<>();
         list.add(srcFile1);
         list.add(srcFile2);
-//        list.add(srcFile3);
-//        list.add(srcFile3);
+        list.add(srcFile5);
+        list.add(srcFile7);
+        list.add(srcFile8);
 
         //  验证  Alpha 透明度通道 与保持图片格式的 关系
         //  Alpha : true      false
@@ -159,9 +164,10 @@ public class MainActivity extends AppCompatActivity {
                 .setNeedLoopCompress(true)
                 .setFocusAlpha(false)
                 .setCompressListener(new ICompressListener() {
+
                     @Override
-                    public void onStart() {
-                        Log.d("Luban", "onStart");
+                    public void onStart(String path) {
+                        Log.d("Luban", "onStart:" + path);
                     }
 
                     @Override
@@ -174,6 +180,11 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onError(Throwable e) {
                         Log.d("Luban", "onStart e :" + e.toString());
+                    }
+
+                    @Override
+                    public void onEnd(Map<String, String> resultMap) {
+                        Log.d("fumm", "onEnd : " + resultMap.size());
                     }
                 })
                 .launch();
@@ -241,8 +252,8 @@ public class MainActivity extends AppCompatActivity {
                 .load(list)
                 .setCompressListener(new ICompressListener() {
                     @Override
-                    public void onStart() {
-                        Log.d("Luban", "onStart");
+                    public void onStart(String path) {
+                        Log.d("Luban", "onStart:" + path);
                     }
 
                     @Override
@@ -253,6 +264,11 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onError(Throwable e) {
                         Log.d("Luban", "onStart e :" + e.toString());
+                    }
+
+                    @Override
+                    public void onEnd(Map<String, String> resultMap) {
+                        Log.d("Luban", "onEnd  :" + resultMap.size());
                     }
                 }).setFilterListener(new IFilterListener() {
                     @Override
