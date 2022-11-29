@@ -4,6 +4,7 @@ import android.net.Uri;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 
 /**
  * author:fumm
@@ -62,21 +63,21 @@ public interface IBuilder {
      * @param need true：需要
      * @return IBuilder
      */
-    IBuilder setNeedLoopCompress(boolean need);
+    // IBuilder setNeedLoopCompress(boolean need);
     /**
      * 同步方法 压缩单个文件方法
      *
      * @param path 单个文件路径
      * @return Furniture
      */
-    Furniture get(String path);
+    String get(String path);
 
     /**
      * 同步方法 压缩多个文件方法
      *
      * @return List<Furniture>
      */
-    List<Furniture> get();
+    Map<String,String> get();
 
     /**
      * 异步方法 压缩文件

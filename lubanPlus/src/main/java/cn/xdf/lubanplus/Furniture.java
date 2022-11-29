@@ -83,18 +83,6 @@ public class Furniture {
         return srcHeight;
     }
 
-    /**
-     * 计算图片文件的宽高
-     */
-    private void calculateSrcSize() {
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-        options.inSampleSize = 1;
-        BitmapFactory.decodeFile(getSrcAbsolutePath(), options);
-        srcWidth = options.outWidth;
-        srcHeight = options.outHeight;
-    }
-
     public String getSrcAbsolutePath() {
         return srcFile.getAbsolutePath();
     }
@@ -106,7 +94,7 @@ public class Furniture {
         return targetFile.getAbsolutePath();
     }
 
-    public long getTargetLenth() {
+    public long getTargetLength() {
         if (targetFile == null) {
             return 0;
         }
@@ -147,7 +135,6 @@ public class Furniture {
         this.targetDir = targetDir;
     }
 
-
     public boolean isFocusAlpha() {
         return focusAlpha;
     }
@@ -170,5 +157,18 @@ public class Furniture {
 
     public void setException(Exception exception) {
         this.exception = exception;
+    }
+
+
+    /**
+     * 计算图片文件的宽高
+     */
+    private void calculateSrcSize() {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        options.inSampleSize = 1;
+        BitmapFactory.decodeFile(getSrcAbsolutePath(), options);
+        srcWidth = options.outWidth;
+        srcHeight = options.outHeight;
     }
 }

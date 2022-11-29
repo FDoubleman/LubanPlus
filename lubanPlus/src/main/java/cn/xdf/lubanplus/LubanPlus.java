@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -30,36 +31,25 @@ import cn.xdf.lubanplus.engine.SampleEngine;
  **/
 public class LubanPlus {
     private static final String sCacheFileDirName = "LuBanPlus";
-
     public static final int MSG_COMPRESS_START = 0;
     public static final int MSG_COMPRESS_SUCCESS = 1;
     public static final int MSG_COMPRESS_ERROR = 2;
     public static final int MSG_COMPRESS_END = 3;
 
-    private List<Furniture> mFurnitureList;
-
-    private int mIgnoreCompressSize;
-    @Deprecated // 暂时loop循环压缩方法 停用
-    private boolean mNeedLoopCompress = false;
-    private ICompressListener mCompressListener;
-    private IFilterListener mFilterListener;
-    private Builder mBuilder;
-
-    // TODO 待优化选择
-    private Executor mExecutor = Executors.newFixedThreadPool(3);
+    private final List<Furniture> mFurnitureList;
+    private final int mIgnoreCompressSize;
+    private final ICompressListener mCompressListener;
+    private final IFilterListener mFilterListener;
+    private final Builder mBuilder;
+    private final Executor mExecutor = Executors.newFixedThreadPool(3);
 
 
     private LubanPlus(Builder builder) {
         this.mFurnitureList = builder.mFurnitureList;
         this.mIgnoreCompressSize = builder.mIgnoreCompressSize;
-        this.mNeedLoopCompress = builder.mNeedLoopCompress;
-
         this.mBuilder = builder;
-
-
         this.mCompressListener = builder.mCompressListener;
         this.mFilterListener = builder.mFilterListener;
-
     }
 
 
@@ -73,13 +63,13 @@ public class LubanPlus {
      * @param path 图片路径
      * @return 压缩后的图片
      */
-    private Furniture get(String path) {
+    private String get(String path) {
         // 是否需要压缩
         if (Checker.needCompress(mIgnoreCompressSize, path, mFilterListener)) {
             // 压缩图片
             Furniture beforeFurn = new Furniture(new File(path),
                     mBuilder.mTargetDir, mBuilder.mFocusAlpha, mBuilder.mQuality);
-            return new SampleEngine(mBuilder.mContext).compress(beforeFurn);
+            return new SampleEngine(mBuilder.mContext).compress(beforeFurn).getTargetAbsolutePath();
         }
         Log.d("LuBanPlus", "get path is error! path:" + path);
         return null;
@@ -88,10 +78,10 @@ public class LubanPlus {
     /**
      * 同步获取 多个压缩图片的方法
      *
-     * @return
+     * @return 图片结果集合 ，对于多个图片压缩
      */
-    private List<Furniture> get() {
-        List<Furniture> furnitureList = new ArrayList<>();
+    private Map<String,String> get() {
+       Map<String,String> resultMap = new HashMap<>();
 
         Iterator<Furniture> iterable = mFurnitureList.iterator();
         while (iterable.hasNext()) {
@@ -100,20 +90,18 @@ public class LubanPlus {
             beforeFur.setQuality(mBuilder.mQuality);
             beforeFur.setTargetDir(mBuilder.mTargetDir);
 
-
             if (Checker.needCompress(mIgnoreCompressSize,
-                    beforeFur.getSrcAbsolutePath(),
-                    mFilterListener)) {
+                    beforeFur.getSrcAbsolutePath(), mFilterListener)) {
                 // 压缩图片
                 Furniture afterFur = new SampleEngine(mBuilder.mContext).compress(beforeFur);
-                furnitureList.add(afterFur);
+                resultMap.put(afterFur.getSrcAbsolutePath(),afterFur.getTargetAbsolutePath());
             } else {
-                furnitureList.add(beforeFur);
+                resultMap.put(beforeFur.getSrcAbsolutePath(),beforeFur.getSrcAbsolutePath());
             }
             iterable.remove();
         }
         // 返回图片
-        return furnitureList;
+        return resultMap;
     }
 
     private void launch() {
@@ -153,8 +141,8 @@ public class LubanPlus {
 
 
     public static class HandlerCall implements Handler.Callback {
-        private ICompressListener mCompressListener;
-        private HashMap<String, String> mResult;
+        private final ICompressListener mCompressListener;
+        private final HashMap<String, String> mResult;
 
         public HandlerCall(ICompressListener compressListener) {
             this.mCompressListener = compressListener;
@@ -192,38 +180,6 @@ public class LubanPlus {
     }
 
     /**
-     * 循环压缩图片到指定大小
-     *
-     * @param beforeFurn beforeFurn
-     * @return Furniture
-     */
-//    private Furniture compress(Furniture beforeFurn) {
-//        Furniture furn = mEngine.compress(beforeFurn);
-//        if(!mNeedLoopCompress){
-//            return furn;
-//        }
-//        File src = furn.getSrcFile();
-//        Log.d("fumm", "loopCompress: " + furn.getTargetLenth());
-//        while (Checker.needContinuePress(mIgnoreCompressSize,
-//                furn.getTargetAbsolutePath())) {
-//            // 继续压缩
-//            Furniture furniture = new Furniture(furn.getTargetFile());
-//            furn = mEngine.compress(furniture);
-//            // 采样率压缩到极致 终止压缩
-//            if (furn.getTargetLenth() / 1024
-//                    == furn.getSrcLength() / 1024) {
-//                break;
-//            }
-//            Log.d("fumm", "loopCompress: " + furn.getTargetLenth());
-//        }
-//        // 设置源文件
-//        furn.setSrcFile(src);
-//        furn.reset();
-//        return furn;
-//    }
-
-
-    /**
      * 如果想了解 更多的 注释和方法 请 阅读  IBuilder
      */
     public static final class Builder implements IBuilder {
@@ -234,9 +190,6 @@ public class LubanPlus {
         private int mIgnoreCompressSize = 100;
         private boolean mFocusAlpha = true;
         private int mQuality = 80;
-        @Deprecated
-        private boolean mNeedLoopCompress = false;
-
         private ICompressListener mCompressListener;
         private IFilterListener mFilterListener;
 
@@ -318,12 +271,6 @@ public class LubanPlus {
         }
 
         @Override
-        public IBuilder setNeedLoopCompress(boolean need) {
-            this.mNeedLoopCompress = need;
-            return this;
-        }
-
-        @Override
         public IBuilder setCompressListener(ICompressListener compressListener) {
             this.mCompressListener = compressListener;
             return this;
@@ -336,12 +283,12 @@ public class LubanPlus {
         }
 
         @Override
-        public Furniture get(String path) {
+        public String get(String path) {
             return build().get(path);
         }
 
         @Override
-        public List<Furniture> get() {
+        public Map<String,String> get() {
             return build().get();
         }
 
@@ -363,7 +310,6 @@ public class LubanPlus {
             // TODO 路径 、重命名 。。。
             mFurnitureList.add(furn);
         }
-
 
         /**
          * 通过 url 转换成File方法；

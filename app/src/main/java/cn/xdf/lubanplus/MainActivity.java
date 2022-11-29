@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
 //        paths.add(srcFile3.getAbsolutePath());
 
 
-        ImageCompress.compress(getApplication(),
+        ImageCompress.compressAsy(getApplication(),
                 paths, 1000, true, new IImageCompressListener() {
                     @Override
                     public void onStart(String filePath) {
@@ -161,7 +161,6 @@ public class MainActivity extends AppCompatActivity {
 //                .get();
         LubanPlus.with(this)
                 .load(list)
-                .setNeedLoopCompress(true)
                 .setFocusAlpha(false)
                 .setCompressListener(new ICompressListener() {
 

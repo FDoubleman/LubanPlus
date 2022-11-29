@@ -53,8 +53,7 @@ public class Checker {
                 !name.contains(DOT)) {
             return "";
         }
-        String suffix = name.substring(name.lastIndexOf(DOT) + 1);
-        return suffix;
+        return name.substring(name.lastIndexOf(DOT) + 1);
     }
 
     /**
@@ -90,11 +89,7 @@ public class Checker {
 
         // 4、自定义的条件是否 满足
         Furniture furniture = new Furniture(source);
-        if (filterListener != null && filterListener.isFilter(furniture)) {
-            return false;
-        }
-
-        return true;
+        return filterListener == null || !filterListener.isFilter(furniture);
     }
 
     public static boolean needContinuePress(int ignoreCompressSize, String path) {

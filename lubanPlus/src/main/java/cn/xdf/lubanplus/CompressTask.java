@@ -19,10 +19,10 @@ import cn.xdf.lubanplus.engine.SampleEngine;
  */
 public class CompressTask implements Runnable {
 
-    private Context mContext;
-    private Handler mHandler;
-    private Furniture mFurn;
-    private CountDownLatch mCountDown;
+    private final Context mContext;
+    private final Handler mHandler;
+    private final Furniture mFurn;
+    private final CountDownLatch mCountDown;
 
     public CompressTask(Context context, Furniture furn, Handler handler, CountDownLatch countDownLatch) {
         this.mHandler = handler;
