@@ -2,18 +2,15 @@ package cn.xdf.lubanplus.engine;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
-import android.os.Environment;
 import android.text.TextUtils;
 import android.util.Log;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import cn.xdf.lubanplus.Checker;
+import cn.xdf.lubanplus.utils.Checker;
 import cn.xdf.lubanplus.Furniture;
 
 /**

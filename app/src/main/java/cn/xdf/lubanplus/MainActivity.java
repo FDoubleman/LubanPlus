@@ -23,8 +23,9 @@ import androidx.navigation.ui.NavigationUI;
 
 import cn.xdf.lubanplus.compress.IImageCompressListener;
 import cn.xdf.lubanplus.compress.ImageCompress;
-import cn.xdf.lubanplus.compress.ImageCompressListenerImp;
 import cn.xdf.lubanplus.databinding.ActivityMainBinding;
+import cn.xdf.lubanplus.listener.ICompressListener;
+import cn.xdf.lubanplus.listener.IFilterListener;
 
 import android.view.Menu;
 import android.view.MenuItem;

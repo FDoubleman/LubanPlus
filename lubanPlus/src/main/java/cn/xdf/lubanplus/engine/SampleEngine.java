@@ -5,15 +5,12 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 
-import cn.xdf.lubanplus.Checker;
+import cn.xdf.lubanplus.utils.Checker;
 import cn.xdf.lubanplus.Furniture;
 
 /**

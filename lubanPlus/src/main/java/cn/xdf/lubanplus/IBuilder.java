@@ -6,6 +6,9 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 
+import cn.xdf.lubanplus.listener.ICompressListener;
+import cn.xdf.lubanplus.listener.IFilterListener;
+
 /**
  * author:fumm
  * Date : 2022/ 11/ 02 11:18

@@ -3,7 +3,6 @@ package cn.xdf.lubanplus;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -21,8 +20,11 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-import cn.xdf.lubanplus.engine.BaseEngine;
 import cn.xdf.lubanplus.engine.SampleEngine;
+import cn.xdf.lubanplus.listener.ICompressListener;
+import cn.xdf.lubanplus.listener.IFilterListener;
+import cn.xdf.lubanplus.utils.Checker;
+import cn.xdf.lubanplus.utils.FileUtils;
 
 /**
  * author:fumm
@@ -30,18 +32,18 @@ import cn.xdf.lubanplus.engine.SampleEngine;
  * Dec : 鲁班plus
  **/
 public class LubanPlus {
-    private static final String sCacheFileDirName = "LuBanPlus";
     public static final int MSG_COMPRESS_START = 0;
     public static final int MSG_COMPRESS_SUCCESS = 1;
     public static final int MSG_COMPRESS_ERROR = 2;
     public static final int MSG_COMPRESS_END = 3;
-
+    // 线程池 线程的数量
+    private static final int sExecutor_Thread_Count = 3;
     private final List<Furniture> mFurnitureList;
     private final int mIgnoreCompressSize;
     private final ICompressListener mCompressListener;
     private final IFilterListener mFilterListener;
     private final Builder mBuilder;
-    private final Executor mExecutor = Executors.newFixedThreadPool(3);
+    private final Executor mExecutor = Executors.newFixedThreadPool(sExecutor_Thread_Count);
 
 
     private LubanPlus(Builder builder) {
@@ -54,7 +56,8 @@ public class LubanPlus {
 
 
     public static Builder with(Context context) {
-        return new Builder(context);
+        Context app = context.getApplicationContext();
+        return new Builder(app);
     }
 
     /**
@@ -72,7 +75,7 @@ public class LubanPlus {
             return new SampleEngine(mBuilder.mContext).compress(beforeFurn).getTargetAbsolutePath();
         }
         Log.d("LuBanPlus", "get path is error! path:" + path);
-        return null;
+        return path;
     }
 
     /**
@@ -218,7 +221,7 @@ public class LubanPlus {
 
         @Override
         public IBuilder load(Uri uri) {
-            File file = uriToFileApiQ(uri, mContext);
+            File file = FileUtils.uriToFileApiQ(uri, mContext);
             if (file == null) {
                 Log.e("LuBanPlus", "load uri is null or nonsupport！");
             } else {
@@ -309,42 +312,6 @@ public class LubanPlus {
             Furniture furn = new Furniture(file);
             // TODO 路径 、重命名 。。。
             mFurnitureList.add(furn);
-        }
-
-        /**
-         * 通过 url 转换成File方法；
-         * 注意考虑大文件 耗时问题！！
-         *
-         * @param uri     uri
-         * @param context context
-         * @return File
-         */
-        private static File uriToFileApiQ(Uri uri, Context context) {
-            File file = null;
-            if (uri == null) return file;
-            //android10以上转换
-            if (uri.getScheme().equals(ContentResolver.SCHEME_FILE)) {
-                file = new File(uri.getPath());
-            } else if (uri.getScheme().equals(ContentResolver.SCHEME_CONTENT)) {
-                // 把文件复制到沙盒目录
-                Log.e("LuBanPlus_uriToFileApiQ", "nonsupport uri :" + uri);
-//                ContentResolver contentResolver = context.getContentResolver();
-//                String displayName = System.currentTimeMillis() + Math.round((Math.random() + 1) * 1000)
-//                        + "." + MimeTypeMap.getSingleton().getExtensionFromMimeType(contentResolver.getType(uri));
-//
-//                try {
-//                    InputStream is = contentResolver.openInputStream(uri);
-//                    File cache = new File(context.getCacheDir().getAbsolutePath(), displayName);
-//                    FileOutputStream fos = new FileOutputStream(cache);
-//                    FileUtils.copy(is, fos);
-//                    file = cache;
-//                    fos.close();
-//                    is.close();
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-            }
-            return file;
         }
     }
 }

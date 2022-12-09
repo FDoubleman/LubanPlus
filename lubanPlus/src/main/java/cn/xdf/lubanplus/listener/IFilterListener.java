@@ -1,4 +1,6 @@
-package cn.xdf.lubanplus;
+package cn.xdf.lubanplus.listener;
+
+import cn.xdf.lubanplus.Furniture;
 
 /**
  * author:fumm

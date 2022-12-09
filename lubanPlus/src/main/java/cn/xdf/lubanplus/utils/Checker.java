@@ -1,4 +1,4 @@
-package cn.xdf.lubanplus;
+package cn.xdf.lubanplus.utils;
 
 import android.graphics.BitmapFactory;
 import android.text.TextUtils;
@@ -6,6 +6,9 @@ import android.util.Log;
 
 import java.io.File;
 import java.util.Arrays;
+
+import cn.xdf.lubanplus.Furniture;
+import cn.xdf.lubanplus.listener.IFilterListener;
 
 /**
  * author:fumm
