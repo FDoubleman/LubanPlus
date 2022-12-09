@@ -24,6 +24,7 @@ import androidx.navigation.ui.NavigationUI;
 import cn.xdf.lubanplus.compress.IImageCompressListener;
 import cn.xdf.lubanplus.compress.ImageCompress;
 import cn.xdf.lubanplus.databinding.ActivityMainBinding;
+import cn.xdf.lubanplus.listener.CompressListenerImp;
 import cn.xdf.lubanplus.listener.ICompressListener;
 import cn.xdf.lubanplus.listener.IFilterListener;
 
@@ -61,8 +62,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 //                testCompressImage();
+                testLaunch();
 //                createTestImageFile();
-                testQulity();
 //                getImageCacheFile("png");
 //                File file = new File(getExternalFilesDir(null), "test_2.png");
 //                Log.d("fmm", "createTestImageFile");
@@ -72,71 +73,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public void testCompressImage() {
-        File srcFile1 = new File(getExternalFilesDir(null), "test_1.png");
-        File srcFile2 = new File(getExternalFilesDir(null), "test_2.jpeg");
-//        File srcFile3 = new File(getExternalFilesDir(null), "test_4.jpg");
-        List<String> paths = new ArrayList<>();
-        paths.add(srcFile1.getAbsolutePath());
-        paths.add(srcFile2.getAbsolutePath());
-
-        paths.add(srcFile1.getAbsolutePath());
-        paths.add(srcFile2.getAbsolutePath());
-        paths.add(srcFile1.getAbsolutePath());
-        paths.add(srcFile2.getAbsolutePath());
-
-//        paths.add(srcFile3.getAbsolutePath());
-
-
-        ImageCompress.compressAsy(getApplication(),
-                paths, 1000, true, new IImageCompressListener() {
-                    @Override
-                    public void onStart(String filePath) {
-                        Log.d("fmm", "onstar : path --> " + filePath);
-                    }
-
-                    @Override
-                    public void onFinish(File file) {
-                        Log.d("fmm", "onFinish : path --> " + file.getAbsolutePath());
-                    }
-
-                    @Override
-                    public void onError(String filePath, Exception exception) {
-                        Log.d("fmm", "onError : path --> " + filePath);
-                    }
-
-                    @Override
-                    public void onEnd(HashMap<String, File> files) {
-                        Log.d("fmm", "onEnd : size --> " + files.size());
-                    }
-                });
-//        ImageCompress.compress(getApplication(),paths,1000,true,
-//                new ImageCompressListenerImp(){
-//            @Override
-//            public void onEnd(HashMap<String, File> files) {
-//                super.onEnd(files);
-//            }
-//        });
-    }
-
-    public void testCountDownLatch() {
-        Log.d("testCountDownLatch", "start !!!");
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                CountDownLatchUtils.testExecutor();
-            }
-        }).start();
-        Log.d("testCountDownLatch", "end !!!");
-    }
-
-    private void testQulity() {
+    /**
+     * 首先通过 createTestImageFile
+     * 按需创建测试图片下面要使用到的图片
+     * 之后验证测试异步压缩
+     */
+    private void testLaunch() {
         File srcFile1 = new File(getExternalFilesDir(null), "test_1.png");
         File srcFile2 = new File(getExternalFilesDir(null), "test_2.jpeg");
         File srcFile5 = new File(getExternalFilesDir(null), "test_5.png");
         File srcFile7 = new File(getExternalFilesDir(null), "test_7.jpg");
         File srcFile8 = new File(getExternalFilesDir(null), "test_8.jpg");
-//        File srcFile3 = new File(getExternalFilesDir(null), "test_4.jpg");
+
         List<File> list = new ArrayList<>();
         list.add(srcFile1);
         list.add(srcFile2);
@@ -144,147 +92,99 @@ public class MainActivity extends AppCompatActivity {
         list.add(srcFile7);
         list.add(srcFile8);
 
-        //  验证  Alpha 透明度通道 与保持图片格式的 关系
-        //  Alpha : true      false
-
-//        Furniture furniture = LubanPlus.with(this)
-//                .setQuality(80)
-//                .setNeedLoopCompress(true)
-//                .setFocusAlpha(false)
-//                .get(srcFile.getAbsolutePath());
-//        Log.d("fumm", "target path: " + furniture.getTargetAbsolutePath() +
-//                "   src file size :"+ furniture.getSrcLength()+
-//                "   target file size : "+ furniture.getTargetLenth() );
-
-//        List<Furniture> listFurn = LubanPlus.with(this)
-//                .load(list)
-//                .setNeedLoopCompress(true)
-//                .get();
-        LubanPlus.with(this)
-                .load(list)
-                .setFocusAlpha(false)
-                .setCompressListener(new ICompressListener() {
-
-                    @Override
-                    public void onStart(String path) {
-                        Log.d("Luban", "onStart:" + path);
-                    }
-
-                    @Override
-                    public void onSuccess(String srcPath, String compressPath) {
-                        Log.d("fumm", "srcPath path: " + srcPath +
-                                "   compressPath file size :" + compressPath);
-                    }
-
-                    @Override
-                    public void onError(String srcPath, Exception exception) {
-                        Log.d("Luban", "onError srcPath :" + srcPath +
-                                " -- exception : "+exception.toString());
-                    }
-
-                    @Override
-                    public void onEnd(Map<String, String> resultMap) {
-                        Log.d("fumm", "onEnd : " + resultMap.size());
-                    }
-                })
-                .launch();
-
-//        for (Furniture furniture : listFurn) {
-//            Log.d("fumm", "target path: " + furniture.getTargetAbsolutePath() +
-//                    "   src file size :" + furniture.getSrcLength() +
-//                    "   target file size : " + furniture.getTargetLenth());
-//        }
-
-//        for (int i = 0; i < listFurn.size(); i++) {
-//            Furniture furniture = LubanPlus.with(this)
-//                    .setQuality(100 - (10 * i))
-//                    .setFocusAlpha(false)
-//                    .get(list.get(i).getAbsolutePath());
-//            furniture.getTargetAbsolutePath();
-//            Log.d("fumm", "target path: " + furniture.getTargetAbsolutePath() +
-//                    "   src file size :"+ furniture.getSrcLength()+
-//                    "   target file size : "+ furniture.getTargetLenth() );
-//        }
-
-    }
-
-
-    private void testLubanPlus() {
-//        File srcFile = new File(getExternalFilesDir(null), "test_1.png");
-//        File srcFile = new File(getExternalFilesDir(null), "test_3.jpeg");
-        File srcFile = new File(getExternalFilesDir(null), "test_4.jpg");
-        List<File> list = new ArrayList<>();
-        list.add(srcFile);
-        list.add(srcFile);
-        list.add(srcFile);
-        list.add(srcFile);
-//        List<File> files = LubanPlus.with(this)
-//                .load(srcFile)
-//                .get();
-
-//        File file1 = LubanPlus.with(this).get(srcFile.getAbsolutePath());
-
-
-//        LubanPlus.with(this).load(list)
-//                .setCompressListener(new ICompressListener() {
-//                    @Override
-//                    public void onStart() {
-//                        Log.d("Luban", "onStart");
-//                    }
-//
-//                    @Override
-//                    public void onSuccess(Furniture furn) {
-//                        Log.d("Luban", "onSuccess file targetDir: " + furn.getTargetAbsolutePath());
-//                    }
-//
-//                    @Override
-//                    public void onError(Throwable e) {
-//                        Log.d("Luban", "onStart e :" + e.toString());
-//                    }
-//                }).launch();
-
-
-        // LubanPlus.with(this).load("").get()
-
-//         String targetDir = this.getCacheDir().getAbsolutePath()+File.separator + "LuBanPlus";
         String targetDir = Environment.getDownloadCacheDirectory().getAbsolutePath();
         LubanPlus.with(this)
                 .load(list)
+                .setFocusAlpha(false)
+                .setTargetDir(targetDir)
+                .setQuality(60)
+                .setFilterListener(new IFilterListener() {
+                    @Override
+                    public boolean isFilter(Furniture furn) {
+                        // 是否压缩过滤，true:过滤不压缩
+                        String srcPath = furn.getSrcAbsolutePath();
+                        return (TextUtils.isEmpty(srcPath) || !srcPath.toLowerCase().endsWith(".gif"));
+                    }
+                })
+                // .setCompressListener(new CompressListenerImp())
                 .setCompressListener(new ICompressListener() {
+
                     @Override
                     public void onStart(String path) {
-                        Log.d("Luban", "onStart:" + path);
+                        // TODO 每个文件开始压缩前调用
+                        Log.d("LubanPlus", "onStart:" + path);
                     }
 
                     @Override
                     public void onSuccess(String srcPath, String compressPath) {
-                        Log.d("fumm", "srcPath path: " + srcPath +
+                        // TODO 每个文件开始压缩成功调用
+                        Log.d("LubanPlus", "srcPath path: " + srcPath +
                                 "   compressPath file size :" + compressPath);
                     }
 
                     @Override
                     public void onError(String srcPath, Exception exception) {
-                        Log.d("Luban", "onError srcPath :" + srcPath +
-                                " -- exception : "+exception.toString());
+                        // TODO 每个文件开始压缩失败调用
+                        Log.d("LubanPlus", "onError srcPath :" + srcPath +
+                                " -- exception : " + exception.toString());
                     }
 
                     @Override
                     public void onEnd(Map<String, String> resultMap) {
-                        Log.d("fumm", "onEnd : " + resultMap.size());
+                        // TODO 所有文件开始压缩完成
+                        Log.d("LubanPlus", "onEnd : " + resultMap.size());
                     }
-                }).setFilterListener(new IFilterListener() {
+                })
+                .launch();
+    }
+
+    /**
+     * 首先通过 createTestImageFile
+     * 按需创建测试图片下面要使用到的图片
+     * 同步方法测试类
+     */
+    private void testGet() {
+        File srcFile1 = new File(getExternalFilesDir(null), "test_1.png");
+        File srcFile2 = new File(getExternalFilesDir(null), "test_2.jpeg");
+        File srcFile5 = new File(getExternalFilesDir(null), "test_5.png");
+        File srcFile = new File(getExternalFilesDir(null), "test_8.jpg");
+        String targetDir = Environment.getDownloadCacheDirectory().getAbsolutePath();
+        // 单个图片同步压缩
+        String targetFile = LubanPlus.with(this)
+                .setTargetDir(targetDir)
+                .setQuality(80)
+                .setIgnoreBy(100)
+                .setFocusAlpha(true)
+                .setFilterListener(new IFilterListener() {
                     @Override
                     public boolean isFilter(Furniture furn) {
-                        Log.d("Luban", "isFilter file targetDir: " + furn.getSrcAbsolutePath());
-                        return false;
+                        // 是否压缩过滤，true:过滤不压缩
+                        String srcPath = furn.getSrcAbsolutePath();
+                        return (TextUtils.isEmpty(srcPath) || !srcPath.toLowerCase().endsWith(".gif"));
                     }
-                }).setFocusAlpha(false)
-                .setTargetDir(targetDir)
-                .setIgnoreBy(110)
-                .launch();
-
+                })
+                .get(srcFile.getAbsolutePath());
+        // 多个图片同步压缩
+        List<File> list = new ArrayList<>();
+        list.add(srcFile1);
+        list.add(srcFile2);
+        list.add(srcFile5);
+        LubanPlus.with(this).setTargetDir(targetDir)
+                .load(list)
+                .setQuality(80)
+                .setIgnoreBy(100)
+                .setFocusAlpha(true)
+                .setFilterListener(new IFilterListener() {
+                    @Override
+                    public boolean isFilter(Furniture furn) {
+                        // 是否压缩过滤，true:过滤不压缩
+                        String srcPath = furn.getSrcAbsolutePath();
+                        return (TextUtils.isEmpty(srcPath) || !srcPath.toLowerCase().endsWith(".gif"));
+                    }
+                }).get();
 
     }
+
 
     public void createTestImageFile() {
         InputStream is = null;

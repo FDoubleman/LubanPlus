@@ -192,7 +192,7 @@ public class LubanPlus {
         private String mTargetDir;
         private int mIgnoreCompressSize = 100;
         private boolean mFocusAlpha = true;
-        private int mQuality = 80;
+        private int mQuality = 60;
         private ICompressListener mCompressListener;
         private IFilterListener mFilterListener;
 
@@ -201,7 +201,7 @@ public class LubanPlus {
             mFurnitureList = new ArrayList<>();
         }
 
-        public LubanPlus build() {
+        private LubanPlus build() {
             return new LubanPlus(this);
         }
 
