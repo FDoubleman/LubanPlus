@@ -101,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
         LubanPlus.with(this)
                 .load(list)
                 .setFocusAlpha(true)
-                .setTargetDir(targetDir)
+                // .setTargetDir(targetDir)
                 .setQuality(80)
                 .setIgnoreBy(100)
                 .setFilterListener(new IFilterListener() {

@@ -77,19 +77,25 @@ implementation 'io.github.FDoubleman:LubanPlus:1.0.0'
 ```java
 LubanPlus.with(this)
     .load(list)
-    .setFocusAlpha(false)
-    .setTargetDir(targetDir)
-    .setQuality(60)
+    .setFocusAlpha(true)
+    // .setTargetDir(targetDir)
+    .setQuality(80)
+    .setIgnoreBy(100)
     .setFilterListener(new IFilterListener() {
         @Override
         public boolean isFilter(Furniture furn) {
             // 是否压缩过滤，true:过滤不压缩
             String srcPath = furn.getSrcAbsolutePath();
-            return (TextUtils.isEmpty(srcPath) || !srcPath.toLowerCase().endsWith(".gif"));
+            return (TextUtils.isEmpty(srcPath) || srcPath.toLowerCase().endsWith(".gif"));
         }
     })
     // .setCompressListener(new CompressListenerImp())
     .setCompressListener(new ICompressListener() {
+
+        @Override
+        public void onReady() {
+            Log.d("LubanPlus", "onReady");
+        }
 
         @Override
         public void onStart(String path) {
@@ -98,23 +104,30 @@ LubanPlus.with(this)
         }
 
         @Override
-        public void onSuccess(String srcPath, String compressPath) {
+        public void onEnd(String srcPath, String compressPath) {
             // TODO 每个文件开始压缩成功调用
-            Log.d("LubanPlus", "srcPath path: " + srcPath +
-                    "   compressPath file size :" + compressPath);
+            File file;
+            if(!TextUtils.isEmpty(compressPath)){
+                file = new File(compressPath);
+            }else{
+                file = new File("");
+            }
+            Log.d("LubanPlus", "onEnd :srcPath path: " + srcPath +
+                    " --> target path:"+compressPath+
+                    "   compressPath file size :" + file.length()/1024.0 +"K");
         }
 
         @Override
         public void onError(String srcPath, Exception exception) {
             // TODO 每个文件开始压缩失败调用
             Log.d("LubanPlus", "onError srcPath :" + srcPath +
-                    " -- exception : "+exception.toString());
+                    " -- exception : " + exception.toString());
         }
 
         @Override
-        public void onEnd(Map<String, String> resultMap) {
+        public void onFinish(Map<String, String> resultMap) {
             // TODO 所有文件开始压缩完成
-            Log.d("LubanPlus", "onEnd : " + resultMap.size());
+            Log.d("LubanPlus", "onFinish : " + resultMap.size());
         }
     })
     .launch();
@@ -125,27 +138,42 @@ LubanPlus.with(this)
 
 #### 同步多文件压缩
 ```java
+ String targetDir =getExternalCacheDir().getAbsolutePath();
+File srcFile1 = new File(getExternalFilesDir(null), "test_1.png");
+File srcFile2 = new File(getExternalFilesDir(null), "test_2.jpeg");
+File srcFile5 = new File(getExternalFilesDir(null), "test_5.png");
+
+// 多个图片同步压缩
+List<File> list = new ArrayList<>();
+list.add(srcFile1);
+list.add(srcFile2);
+list.add(new File(""));
+list.add(srcFile5);
 LubanPlus.with(this).setTargetDir(targetDir)
-    .load(list)
-    .setQuality(80)
-    .setIgnoreBy(100)
-    .setFocusAlpha(true)
-    .setFilterListener(new IFilterListener() {
-        @Override
-        public boolean isFilter(Furniture furn) {
-            // 是否压缩过滤，true:过滤不压缩
-            String srcPath = furn.getSrcAbsolutePath();
-            return (TextUtils.isEmpty(srcPath) || !srcPath.toLowerCase().endsWith(".gif"));
-        }
-    }).get();
+        .load(list)
+        .setQuality(80)
+        .setIgnoreBy(100)
+        .setFocusAlpha(true)
+        .setFilterListener(new IFilterListener() {
+            @Override
+            public boolean isFilter(Furniture furn) {
+                // 是否压缩过滤，true:过滤不压缩
+                String srcPath = furn.getSrcAbsolutePath();
+                return (TextUtils.isEmpty(srcPath) || srcPath.toLowerCase().endsWith(".gif"));
+            }
+        }).get();
+for (File file : list) {
+    Log.d("LubanPlus", "testGet : path---> "
+            + file.getAbsolutePath() +"  size:" + file.length());
+}
 
 ```
 
 #### 同步单文件压缩
 
 ```java
-String targetFile = 
-LubanPlus.with(this)
+// 单个图片同步压缩
+String targetFile = LubanPlus.with(this)
     .setTargetDir(targetDir)
     .setQuality(80)
     .setIgnoreBy(100)
@@ -155,10 +183,11 @@ LubanPlus.with(this)
         public boolean isFilter(Furniture furn) {
             // 是否压缩过滤，true:过滤不压缩
             String srcPath = furn.getSrcAbsolutePath();
-            return (TextUtils.isEmpty(srcPath) || !srcPath.toLowerCase().endsWith(".gif"));
+            return (TextUtils.isEmpty(srcPath) || srcPath.toLowerCase().endsWith(".gif"));
         }
     })
     .get(srcFile.getAbsolutePath());
+Log.d("LubanPlus", "testGet : " +targetFile);
 ```
 
 ## License

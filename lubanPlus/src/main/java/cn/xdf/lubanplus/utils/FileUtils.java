@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  * author:fumm
@@ -17,6 +18,7 @@ import java.io.InputStream;
  * Dec : 文件相关工具类
  **/
 public class FileUtils {
+    public static final int DEFAULT_BUFFER_SIZE = 1024 * 4;
 
     /**
      * 通过 url 转换成File方法；
@@ -35,22 +37,47 @@ public class FileUtils {
         } else if (uri.getScheme().equals(ContentResolver.SCHEME_CONTENT)) {
             // 把文件复制到沙盒目录
             Log.e("LuBanPlus_uriToFileApiQ", "nonsupport uri :" + uri);
-//                ContentResolver contentResolver = context.getContentResolver();
-//                String displayName = System.currentTimeMillis() + Math.round((Math.random() + 1) * 1000)
-//                        + "." + MimeTypeMap.getSingleton().getExtensionFromMimeType(contentResolver.getType(uri));
-//
-//                try {
-//                    InputStream is = contentResolver.openInputStream(uri);
-//                    File cache = new File(context.getCacheDir().getAbsolutePath(), displayName);
-//                    FileOutputStream fos = new FileOutputStream(cache);
-//                    FileUtils.copy(is, fos);
-//                    file = cache;
-//                    fos.close();
-//                    is.close();
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
+            ContentResolver contentResolver = context.getContentResolver();
+            String displayName = System.currentTimeMillis() + Math.round((Math.random() + 1) * 1000)
+                    + "." + MimeTypeMap.getSingleton().getExtensionFromMimeType(contentResolver.getType(uri));
+
+            try {
+                InputStream in = contentResolver.openInputStream(uri);
+                File cache = new File(context.getCacheDir().getAbsolutePath(), displayName);
+                copyInputStreamToFile(in, cache);
+                file = cache;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         return file;
+    }
+
+
+    private static void copyInputStreamToFile(InputStream in, File file) {
+        OutputStream out = null;
+        try {
+            out = new FileOutputStream(file);
+            byte[] buf = new byte[DEFAULT_BUFFER_SIZE];
+            int len;
+            while ((len = in.read(buf)) > 0) {
+                out.write(buf, 0, len);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            // Ensure that the InputStreams are closed even if there's an exception.
+            try {
+                if (out != null) {
+                    out.close();
+                }
+
+                // If you want to close the "in" InputStream yourself then remove this
+                // from here but ensure that you close it yourself eventually.
+                in.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

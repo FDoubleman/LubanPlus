@@ -16,8 +16,6 @@ import cn.xdf.lubanplus.listener.IFilterListener;
  * Dec : 图片相关的检测
  **/
 public class Checker {
-
-    private static final String TAG = "LubanPlus";
     private static final String REAL_JPG_FORMAT = "image/jpeg";
     private static final String JPG = "jpg";
     private static final String PNG = "png";
@@ -37,7 +35,7 @@ public class Checker {
         options.inJustDecodeBounds = true;
         BitmapFactory.decodeFile(file.getAbsolutePath(), options);
         String type = options.outMimeType;
-        Log.d("isJPG", "really format :" + type);
+        // Log.d("isJPG", "really format :" + type);
         return REAL_JPG_FORMAT.equalsIgnoreCase(type);
     }
 
@@ -104,10 +102,10 @@ public class Checker {
         File source = new File(path);
         // 2、指定压缩大小是否满足
         if ((source.length() <= ((long) ignoreCompressSize << 10))) {
-            Log.d("fumm ", "needContinuePress : 不需要压缩");
+            Log.d("LubanPlus ", "needContinuePress : 不需要压缩");
             return false;
         }
-        Log.d("fumm ", "needContinuePress : 需要压缩");
+        Log.d("LubanPlus ", "needContinuePress : 需要压缩");
         return true;
     }
 
