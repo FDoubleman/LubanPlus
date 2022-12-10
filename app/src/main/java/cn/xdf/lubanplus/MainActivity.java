@@ -61,12 +61,12 @@ public class MainActivity extends AppCompatActivity {
         binding.fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                testCompressImage();
+//                createTestImageFile("test_1.png");
+//                createTestImageFile("test_2.jpeg");
+//                createTestImageFile("test_5.png");
+//                createTestImageFile("test_7.jpg");
+//                createTestImageFile("test_8.jpg");
                 testLaunch();
-//                createTestImageFile();
-//                getImageCacheFile("png");
-//                File file = new File(getExternalFilesDir(null), "test_2.png");
-//                Log.d("fmm", "createTestImageFile");
             }
         });
         initPermission();
@@ -86,24 +86,30 @@ public class MainActivity extends AppCompatActivity {
         File srcFile8 = new File(getExternalFilesDir(null), "test_8.jpg");
 
         List<File> list = new ArrayList<>();
+        list.add(new File(""));
+        list.add(new File(""));
         list.add(srcFile1);
         list.add(srcFile2);
         list.add(srcFile5);
         list.add(srcFile7);
         list.add(srcFile8);
-
-        String targetDir = Environment.getDownloadCacheDirectory().getAbsolutePath();
+        String targetDir =getExternalCacheDir().getAbsolutePath();
+        // android 11 及以后的版本 error ：open failed: EACCES (Permission denied)
+        // 更多信息：https://stackoverflow.com/questions/8854359/exception-open-failed-eacces-permission-denied-on-android
+        //         https://developer.android.com/training/data-storage#scoped-storage
+        // String targetDir = Environment.getDownloadCacheDirectory().getAbsolutePath();
         LubanPlus.with(this)
                 .load(list)
-                .setFocusAlpha(false)
+                .setFocusAlpha(true)
                 .setTargetDir(targetDir)
-                .setQuality(60)
+                .setQuality(80)
+                .setIgnoreBy(100)
                 .setFilterListener(new IFilterListener() {
                     @Override
                     public boolean isFilter(Furniture furn) {
                         // 是否压缩过滤，true:过滤不压缩
                         String srcPath = furn.getSrcAbsolutePath();
-                        return (TextUtils.isEmpty(srcPath) || !srcPath.toLowerCase().endsWith(".gif"));
+                        return (TextUtils.isEmpty(srcPath) || srcPath.toLowerCase().endsWith(".gif"));
                     }
                 })
                 // .setCompressListener(new CompressListenerImp())
@@ -123,8 +129,15 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onEnd(String srcPath, String compressPath) {
                         // TODO 每个文件开始压缩成功调用
-                        Log.d("LubanPlus", "srcPath path: " + srcPath +
-                                "   compressPath file size :" + compressPath);
+                        File file;
+                        if(!TextUtils.isEmpty(compressPath)){
+                            file = new File(compressPath);
+                        }else{
+                            file = new File("");
+                        }
+                        Log.d("LubanPlus", "onEnd :srcPath path: " + srcPath +
+                                " --> target path:"+compressPath+
+                                "   compressPath file size :" + file.length()/1024.0 +"K");
                     }
 
                     @Override
@@ -137,7 +150,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onFinish(Map<String, String> resultMap) {
                         // TODO 所有文件开始压缩完成
-                        Log.d("LubanPlus", "onEnd : " + resultMap.size());
+                        Log.d("LubanPlus", "onFinish : " + resultMap.size());
                     }
                 })
                 .launch();
@@ -191,11 +204,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public void createTestImageFile() {
+    public void createTestImageFile(String assetsFileName) {
         InputStream is = null;
         try {
-            is = getResources().getAssets().open("test_2.jpeg");
-            File file = new File(getExternalFilesDir(null), "test_2.jpeg");
+            is = getResources().getAssets().open(assetsFileName);
+            // path : /storage/emulated/0/Android/data/cn.xdf.lubanplus/files/assetsFileName
+            File file = new File(getExternalFilesDir(null),assetsFileName );
             Log.d("createTestImageFile", "file path: "
                     + file.getAbsolutePath());
             FileOutputStream fos = new FileOutputStream(file);

@@ -177,7 +177,6 @@ public class LubanPlus {
     }
 
     private void realLaunch(Furniture beforeFurn, Handler handler, CountDownLatch countDownLatch) {
-        handler.sendMessage(handler.obtainMessage(MSG_COMPRESS_READY));
         mExecutor.execute(new CompressTask(mBuilder.mContext, beforeFurn,
                 handler, countDownLatch));
     }
