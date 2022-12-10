@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -32,10 +33,11 @@ import cn.xdf.lubanplus.utils.FileUtils;
  * Dec : 鲁班plus
  **/
 public class LubanPlus {
-    public static final int MSG_COMPRESS_START = 0;
-    public static final int MSG_COMPRESS_SUCCESS = 1;
-    public static final int MSG_COMPRESS_ERROR = 2;
-    public static final int MSG_COMPRESS_END = 3;
+    public static final int MSG_COMPRESS_READY = 0;
+    public static final int MSG_COMPRESS_START = 1;
+    public static final int MSG_COMPRESS_END = 2;
+    public static final int MSG_COMPRESS_ERROR = 3;
+    public static final int MSG_COMPRESS_FINISH = 4;
     // 线程池 线程的数量
     private static final int sExecutor_Thread_Count = 3;
     private final List<Furniture> mFurnitureList;
@@ -70,9 +72,12 @@ public class LubanPlus {
         // 是否需要压缩
         if (Checker.needCompress(mIgnoreCompressSize, path, mFilterListener)) {
             // 压缩图片
-            Furniture beforeFurn = new Furniture(new File(path),
-                    mBuilder.mTargetDir, mBuilder.mFocusAlpha, mBuilder.mQuality);
-            return new SampleEngine(mBuilder.mContext).compress(beforeFurn).getTargetAbsolutePath();
+            Furniture beforeFur = new Furniture(new File(path));
+            Furniture.CompressConfig config = new Furniture.CompressConfig(mBuilder.mTargetDir,
+                    mBuilder.mFocusAlpha,mBuilder.mQuality);
+            beforeFur.setConfig(config);
+
+            return new SampleEngine(mBuilder.mContext).compress(beforeFur).getTargetAbsolutePath();
         }
         Log.d("LuBanPlus", "get path is error! path:" + path);
         return path;
@@ -89,9 +94,9 @@ public class LubanPlus {
         Iterator<Furniture> iterable = mFurnitureList.iterator();
         while (iterable.hasNext()) {
             Furniture beforeFur = iterable.next();
-            beforeFur.setFocusAlpha(mBuilder.mFocusAlpha);
-            beforeFur.setQuality(mBuilder.mQuality);
-            beforeFur.setTargetDir(mBuilder.mTargetDir);
+            Furniture.CompressConfig config = new Furniture.CompressConfig(mBuilder.mTargetDir,
+                    mBuilder.mFocusAlpha,mBuilder.mQuality);
+            beforeFur.setConfig(config);
 
             if (Checker.needCompress(mIgnoreCompressSize,
                     beforeFur.getSrcAbsolutePath(), mFilterListener)) {
@@ -108,36 +113,71 @@ public class LubanPlus {
     }
 
     private void launch() {
-        Iterator<Furniture> iterable = mFurnitureList.iterator();
+        if(mFurnitureList.isEmpty()){
+           Log.d("LuBanPlus","launch image size is zero!");
+        }
         Handler handler = new Handler(Looper.getMainLooper(), new HandlerCall(mCompressListener));
+        handler.sendMessage(handler.obtainMessage(MSG_COMPRESS_READY));
 
+        Iterator<Furniture> iterable = mFurnitureList.iterator();
         int furnSize = mFurnitureList.size();
         // 1、检查过滤
         while (iterable.hasNext()) {
             Furniture beforeFurn = iterable.next();
-            beforeFurn.setFocusAlpha(mBuilder.mFocusAlpha);
-            beforeFurn.setQuality(mBuilder.mQuality);
-            beforeFurn.setTargetDir(mBuilder.mTargetDir);
-
             // 压缩前检查
             if (!Checker.needCompress(mIgnoreCompressSize,
                     beforeFurn.getSrcAbsolutePath(),
                     mFilterListener)) {
+                // 检查，不需要压缩后 直接返回原来地址
+                handler.sendMessage(handler.obtainMessage(MSG_COMPRESS_START, beforeFurn));
+
+                beforeFurn.setTargetFile(beforeFurn.getSrcFile());
+                handler.sendMessage(handler.obtainMessage(MSG_COMPRESS_END, beforeFurn));
+
                 iterable.remove();
                 furnSize--;
             }
         }
         if (furnSize <= 0) {
+            handler.sendMessage(handler.obtainMessage(MSG_COMPRESS_FINISH));
             return;
         }
+
         CountDownLatch countDownLatch = new CountDownLatch(furnSize);
         for (Furniture beforeFurn : mFurnitureList) {
+            Furniture.CompressConfig config = new Furniture.CompressConfig(mBuilder.mTargetDir,
+                    mBuilder.mFocusAlpha,mBuilder.mQuality);
+            beforeFurn.setConfig(config);
             realLaunch(beforeFurn, handler, countDownLatch);
         }
         mFurnitureList.clear();
     }
 
+    // TODO 替换
+    private void obtain(Handler handler){
+        Iterator<Furniture> iterable = mFurnitureList.iterator();
+        int furnSize = mFurnitureList.size();
+        // 1、检查过滤
+        while (iterable.hasNext()) {
+            Furniture beforeFurn = iterable.next();
+            // 压缩前检查
+            if (!Checker.needCompress(mIgnoreCompressSize,
+                    beforeFurn.getSrcAbsolutePath(),
+                    mFilterListener)) {
+                // 检查，不需要压缩后 直接返回原来地址
+                handler.sendMessage(handler.obtainMessage(MSG_COMPRESS_START, beforeFurn));
+
+                beforeFurn.setTargetFile(beforeFurn.getSrcFile());
+                handler.sendMessage(handler.obtainMessage(MSG_COMPRESS_END, beforeFurn));
+
+                iterable.remove();
+                furnSize--;
+            }
+        }
+    }
+
     private void realLaunch(Furniture beforeFurn, Handler handler, CountDownLatch countDownLatch) {
+        handler.sendMessage(handler.obtainMessage(MSG_COMPRESS_READY));
         mExecutor.execute(new CompressTask(mBuilder.mContext, beforeFurn,
                 handler, countDownLatch));
     }
@@ -156,20 +196,23 @@ public class LubanPlus {
         public boolean handleMessage(@NonNull Message message) {
             if (mCompressListener == null) return false;
             switch (message.what) {
+                case MSG_COMPRESS_READY:
+                    mCompressListener.onReady();
+                    break;
                 case MSG_COMPRESS_START:
                     Furniture furniture = (Furniture) message.obj;
                     mCompressListener.onStart(furniture.getSrcAbsolutePath());
                     break;
-                case MSG_COMPRESS_SUCCESS:
+                case MSG_COMPRESS_END:
                     Furniture succ = (Furniture) message.obj;
                     String srcPath = succ.getSrcAbsolutePath();
                     String targetPath = succ.getTargetAbsolutePath();
-
-                    mCompressListener.onSuccess(srcPath, targetPath);
+                    // TODO 可能为空情况
+                    mCompressListener.onEnd(srcPath, targetPath);
                     mResult.put(srcPath, targetPath);
                     break;
-                case MSG_COMPRESS_END:
-                    mCompressListener.onEnd(mResult);
+                case MSG_COMPRESS_FINISH:
+                    mCompressListener.onFinish(mResult);
                     break;
                 case MSG_COMPRESS_ERROR:
                     Furniture err = (Furniture) message.obj;

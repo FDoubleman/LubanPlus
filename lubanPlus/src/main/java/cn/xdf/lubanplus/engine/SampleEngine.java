@@ -41,13 +41,14 @@ public class SampleEngine extends BaseEngine {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         // format : png 格式 保留 Alpha 通道 ，jpeg：格式不支持 Alpha通道
         // quality : png 设置无效\
-        boolean focusAlpha = furni.isFocusAlpha();
-        int quality = furni.getQuality();
+        Furniture.CompressConfig compressConfig =furni.getConfig();
+        boolean focusAlpha = compressConfig.isFocusAlpha();
+        int quality = compressConfig.getQuality();
 
         tagBitmap.compress(focusAlpha ? Bitmap.CompressFormat.PNG : Bitmap.CompressFormat.JPEG,
                 quality, outputStream);
         tagBitmap.recycle();
-        Log.d("fumm compress", "mQuality : " + quality);
+        Log.d("realCompress", "mQuality : " + quality);
 
         // 4、outputStream 转换为File
         File targetFile = getImageCacheFile(furni);

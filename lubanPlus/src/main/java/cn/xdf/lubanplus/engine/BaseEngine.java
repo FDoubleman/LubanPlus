@@ -17,10 +17,9 @@ import cn.xdf.lubanplus.Furniture;
  * author:fumm
  * Date : 2022/ 10/ 31 15:09
  * Dec : 图片压缩基础引擎 ,
- *       图片压缩可能使用到的通用 公共方法  ，位于此
+ * 图片压缩可能使用到的通用 公共方法  ，位于此
  **/
 public abstract class BaseEngine implements IEngine {
-    private static final String sCacheFileDirName = "LuBanPlus";
     protected Context context;
 
     public BaseEngine(Context context) {
@@ -61,8 +60,9 @@ public abstract class BaseEngine implements IEngine {
 
     /**
      * bitmap 旋转 angle 度 图片
+     *
      * @param bitmap bitmap
-     * @param angle angle
+     * @param angle  angle
      * @return Bitmap
      */
     protected Bitmap rotatingImage(Bitmap bitmap, int angle) {
@@ -74,12 +74,12 @@ public abstract class BaseEngine implements IEngine {
 
     /**
      * 获取图片角度
+     *
      * @param fileAbsolutePath file AbsolutePath
      * @return 角度
      */
     protected int getOrientation(String fileAbsolutePath) {
         try {
-            Log.d("getOrientation","fileAbsolutePath: " + fileAbsolutePath);
             ExifInterface exif = new ExifInterface(fileAbsolutePath);
             int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION,
                     ExifInterface.ORIENTATION_NORMAL);
@@ -107,19 +107,9 @@ public abstract class BaseEngine implements IEngine {
      * @return 图片缓存文件
      */
     public File getImageCacheFile(Furniture furni) {
-
         String suffix = Checker.getSuffix(furni.getSrcFile());
-        String targetDir =furni.getTargetDir(context) ;
+        String targetDir = furni.getConfig().getTargetDir(context);
 
-
-//        String targetDir = Environment.getDownloadCacheDirectory().getAbsolutePath();
-//        String targetDir = Environment.getDownloadCacheDirectory().getAbsolutePath() +
-//                File.separator + sCacheFileDirName;
-        // 文件夹不存在 创建
-//        File dirFile = new File(targetDir);
-//        if(!dirFile.exists()){
-//            dirFile.mkdirs();
-//        }
         File file = new File(targetDir);
         if (!file.exists()) {
             file.mkdirs();
@@ -129,17 +119,6 @@ public abstract class BaseEngine implements IEngine {
                 System.currentTimeMillis() +
                 (int) (Math.random() * 1000) +
                 (TextUtils.isEmpty(suffix) ? ".jpg" : "." + suffix);
-
-//        File file = new File(cacheBuilder);
-//        if(!file.exists()){
-//            file.mkdirs();
-//        }
-//        try {
-//            file.createNewFile();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
         return new File(cacheBuilder);
     }
-
 }

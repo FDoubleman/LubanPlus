@@ -4,8 +4,12 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
+import android.webkit.MimeTypeMap;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * author:fumm
@@ -49,6 +53,4 @@ public class FileUtils {
         }
         return file;
     }
-
-
 }

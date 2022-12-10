@@ -13,14 +13,20 @@ public class CompressListenerImp implements ICompressListener{
     private static final String Tag = CompressListenerImp.class.getSimpleName();
 
     @Override
+    public void onReady() {
+        Log.d(Tag,"onReady: do UI loading work ");
+    }
+
+    @Override
     public void onStart(String srcPath) {
         Log.d(Tag,"onStart:"+srcPath);
     }
 
     @Override
-    public void onSuccess(String srcPath, String compressPath) {
+    public void onEnd(String srcPath, String compressPath) {
         Log.d(Tag,"onSuccess -> srcPath: " + srcPath +"  compressPath: "+ compressPath);
     }
+
 
     @Override
     public void onError(String srcPath, Exception exception) {
@@ -28,7 +34,8 @@ public class CompressListenerImp implements ICompressListener{
     }
 
     @Override
-    public void onEnd(Map<String, String> resultMap) {
+    public void onFinish(Map<String, String> resultMap) {
         Log.d(Tag," onEnd: resultMap size :"+ resultMap.size());
     }
+
 }

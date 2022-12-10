@@ -1,7 +1,5 @@
 package cn.xdf.lubanplus.engine;
 
-import java.io.File;
-
 import cn.xdf.lubanplus.Furniture;
 
 /**

@@ -2,8 +2,9 @@ package cn.xdf.lubanplus;
 
 import static cn.xdf.lubanplus.LubanPlus.MSG_COMPRESS_END;
 import static cn.xdf.lubanplus.LubanPlus.MSG_COMPRESS_ERROR;
+import static cn.xdf.lubanplus.LubanPlus.MSG_COMPRESS_FINISH;
 import static cn.xdf.lubanplus.LubanPlus.MSG_COMPRESS_START;
-import static cn.xdf.lubanplus.LubanPlus.MSG_COMPRESS_SUCCESS;
+
 
 import android.content.Context;
 import android.os.Handler;
@@ -40,7 +41,7 @@ public class CompressTask implements Runnable {
                 mFurn.setException(new IOException("LuBanPlus compress Image IO Exception!"));
                 mHandler.sendMessage(mHandler.obtainMessage(MSG_COMPRESS_ERROR, mFurn));
             } else {
-                mHandler.sendMessage(mHandler.obtainMessage(MSG_COMPRESS_SUCCESS, furn));
+                mHandler.sendMessage(mHandler.obtainMessage(MSG_COMPRESS_END, furn));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -49,7 +50,7 @@ public class CompressTask implements Runnable {
         } finally {
             mCountDown.countDown();
             if (mCountDown.getCount() == 0) {
-                mHandler.sendMessage(mHandler.obtainMessage(MSG_COMPRESS_END));
+                mHandler.sendMessage(mHandler.obtainMessage(MSG_COMPRESS_FINISH));
             }
         }
     }

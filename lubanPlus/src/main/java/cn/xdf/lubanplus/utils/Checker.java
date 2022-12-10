@@ -37,7 +37,7 @@ public class Checker {
         options.inJustDecodeBounds = true;
         BitmapFactory.decodeFile(file.getAbsolutePath(), options);
         String type = options.outMimeType;
-        Log.d("isJPG", "真正的图片格式" + type);
+        Log.d("isJPG", "really format :" + type);
         return REAL_JPG_FORMAT.equalsIgnoreCase(type);
     }
 

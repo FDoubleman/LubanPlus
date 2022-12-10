@@ -1,14 +1,14 @@
 # LubanPlus
-基于Luban改进而来的图片压缩库，功能更加丰富。持续完善开发中
+基于Luban改进而来的图片压缩库，功能更加丰富、迭代更迅速。持续完善开发中
 
-`LubanPlus`（鲁班） —— `Android`图片压缩工具，仿微信朋友圈压缩策略。
+`LubanPlus`（鲁班+） —— `Android`图片压缩工具，仿微信朋友圈压缩策略。
 
 ## 写在前面
 从事`App`开发离不开图片压缩功能，而 [Luban](https://github.com/Curzibn/Luban) 是比较优秀的图片压缩库。
 
 随着时间的推移`Luban`库很久没有更新迭代了，已知的一些`Bug`也无法被修改，某些新的业务需求单靠`Luban`自身的`Api`无法实现。
 
-遂结合工作需求、`Luban`库框架`Api`冒昧重构了此LubanPlus项目。
+遂结合工作需求、`Luban`库框架`Api`冒昧重构了此`LubanPlus`项目。
 
 
 ## 项目和功能描述
@@ -33,7 +33,7 @@
 
 ## 效果对比
 
-由于基于Luban封装 效果相同：
+由于基于`Luban`封装 效果相同：
 内容 | 原图 | `Luban` | `Wechat`
 ---- | ---- | ------ | ------
 截屏 720P |720*1280,390k|720*1280,87k|720*1280,56k
@@ -158,7 +158,7 @@ LubanPlus.with(this)
 
 ## License
 
-    Copyright 2016 Zheng Zibin
+    Copyright 2022 Fu ManMan
     
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.

@@ -110,13 +110,18 @@ public class MainActivity extends AppCompatActivity {
                 .setCompressListener(new ICompressListener() {
 
                     @Override
+                    public void onReady() {
+                        Log.d("LubanPlus", "onReady");
+                    }
+
+                    @Override
                     public void onStart(String path) {
                         // TODO 每个文件开始压缩前调用
                         Log.d("LubanPlus", "onStart:" + path);
                     }
 
                     @Override
-                    public void onSuccess(String srcPath, String compressPath) {
+                    public void onEnd(String srcPath, String compressPath) {
                         // TODO 每个文件开始压缩成功调用
                         Log.d("LubanPlus", "srcPath path: " + srcPath +
                                 "   compressPath file size :" + compressPath);
@@ -130,7 +135,7 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     @Override
-                    public void onEnd(Map<String, String> resultMap) {
+                    public void onFinish(Map<String, String> resultMap) {
                         // TODO 所有文件开始压缩完成
                         Log.d("LubanPlus", "onEnd : " + resultMap.size());
                     }

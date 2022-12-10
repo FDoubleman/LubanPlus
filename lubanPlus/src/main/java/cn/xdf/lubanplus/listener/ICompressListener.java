@@ -11,6 +11,11 @@ import java.util.Map;
 public interface ICompressListener {
 
     /**
+     * 图片压缩准备
+     */
+    void onReady();
+
+    /**
      * 图片压缩开始时回调
      * @param srcPath 原始图片路径
      */
@@ -21,7 +26,7 @@ public interface ICompressListener {
      * @param srcPath 原始图片路径
      * @param compressPath 压缩图片后的路径
      */
-    void onSuccess(String srcPath,String compressPath);
+    void onEnd(String srcPath,String compressPath);
 
     /**
      * 图片压缩时 发生错误的回调
@@ -34,5 +39,5 @@ public interface ICompressListener {
      * 图片list全部压缩完成之后的回调
      * @param resultMap 压缩结果
      */
-    void onEnd(Map<String,String> resultMap);
+    void onFinish(Map<String,String> resultMap);
 }
