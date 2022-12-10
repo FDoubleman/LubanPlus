@@ -159,14 +159,12 @@ public class MainActivity extends AppCompatActivity {
     /**
      * 首先通过 createTestImageFile
      * 按需创建测试图片下面要使用到的图片
-     * 同步方法测试类
+     * 同步方法 压缩单个图片  测试类
      */
     private void testGet() {
-        File srcFile1 = new File(getExternalFilesDir(null), "test_1.png");
-        File srcFile2 = new File(getExternalFilesDir(null), "test_2.jpeg");
-        File srcFile5 = new File(getExternalFilesDir(null), "test_5.png");
         File srcFile = new File(getExternalFilesDir(null), "test_8.jpg");
-        String targetDir = Environment.getDownloadCacheDirectory().getAbsolutePath();
+        String targetDir =getExternalCacheDir().getAbsolutePath();
+        // String targetDir = Environment.getDownloadCacheDirectory().getAbsolutePath();
         // 单个图片同步压缩
         String targetFile = LubanPlus.with(this)
                 .setTargetDir(targetDir)
@@ -178,14 +176,31 @@ public class MainActivity extends AppCompatActivity {
                     public boolean isFilter(Furniture furn) {
                         // 是否压缩过滤，true:过滤不压缩
                         String srcPath = furn.getSrcAbsolutePath();
-                        return (TextUtils.isEmpty(srcPath) || !srcPath.toLowerCase().endsWith(".gif"));
+                        return (TextUtils.isEmpty(srcPath) || srcPath.toLowerCase().endsWith(".gif"));
                     }
                 })
                 .get(srcFile.getAbsolutePath());
+        Log.d("LubanPlus", "testGet : " +targetFile);
+
+
+    }
+
+    /**
+     * 首先通过 createTestImageFile
+     * 按需创建测试图片下面要使用到的图片
+     * 同步方法 压缩多个图片  测试类
+     */
+    private void testListGet(){
+        String targetDir =getExternalCacheDir().getAbsolutePath();
+        File srcFile1 = new File(getExternalFilesDir(null), "test_1.png");
+        File srcFile2 = new File(getExternalFilesDir(null), "test_2.jpeg");
+        File srcFile5 = new File(getExternalFilesDir(null), "test_5.png");
+
         // 多个图片同步压缩
         List<File> list = new ArrayList<>();
         list.add(srcFile1);
         list.add(srcFile2);
+        list.add(new File(""));
         list.add(srcFile5);
         LubanPlus.with(this).setTargetDir(targetDir)
                 .load(list)
@@ -197,12 +212,14 @@ public class MainActivity extends AppCompatActivity {
                     public boolean isFilter(Furniture furn) {
                         // 是否压缩过滤，true:过滤不压缩
                         String srcPath = furn.getSrcAbsolutePath();
-                        return (TextUtils.isEmpty(srcPath) || !srcPath.toLowerCase().endsWith(".gif"));
+                        return (TextUtils.isEmpty(srcPath) || srcPath.toLowerCase().endsWith(".gif"));
                     }
                 }).get();
-
+        for (File file : list) {
+            Log.d("LubanPlus", "testGet : path---> "
+                    + file.getAbsolutePath() +"  size:" + file.length());
+        }
     }
-
 
     public void createTestImageFile(String assetsFileName) {
         InputStream is = null;
