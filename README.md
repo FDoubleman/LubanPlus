@@ -65,7 +65,8 @@ implementation 'io.github.FDoubleman:LubanPlus:1.0.0'
 
 ### 参数效果图
 
-> 注意：png图片格式压缩设置 setFocusAlpha(false) ,会导致的透明背景变成黑色，使用时注意！ 
+` 注意：png图片格式压缩设置 setFocusAlpha(false) ,会导致的透明背景变成黑色，使用时注意！ `
+
 ![image](https://github.com/FDoubleman/LubanPlus/blob/master/app/src/main/assets/parameter_effect.png)
 
 ### 异步调用
