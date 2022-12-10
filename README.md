@@ -63,7 +63,8 @@ implementation 'io.github.FDoubleman:LubanPlus:1.0.0'
 |  setCompressListener| 异步压缩回调 |
 |  setFilterListener| 压缩过滤监听 |
 
-
+### 参数效果图
+![image](https://github.com/FDoubleman/LubanPlus/blob/master/app/src/main/assets/parameter_effect.png)
 ### 异步调用
 `LubanPlus`内存采用固定3个线程的线程池并行压缩，外部可以按需创建`ICompressListener`的默认实现类，重写其对应的方法。
 
