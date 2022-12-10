@@ -44,7 +44,7 @@
 
 ## 导入
 ```sh
-implementation 'io.github.FDoubleman:LubanPlus:1.0.0'
+implementation 'io.github.FDoubleman:LubanPlus:1.0.1'
 ```
 ## 使用
 
@@ -189,6 +189,23 @@ String targetFile = LubanPlus.with(this)
     .get(srcFile.getAbsolutePath());
 Log.d("LubanPlus", "testGet : " +targetFile);
 ```
+## About issues
+
+`关于issuse请参考如下模板：`
+
+- `1、问题类型`：如：反馈bug or 添加新功能
+- `2、运行环境`：如：android 10(Q)
+- `3、使用版本`：如：1.0.1
+- `4、问题详细日志`：Log
+- `5、新增功能使用场景描述`：某XXXX
+
+
+
+本人尽量在最短时间内回复。
+
+谢谢！
+
+
 
 ## License
 
