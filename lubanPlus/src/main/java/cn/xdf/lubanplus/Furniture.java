@@ -6,6 +6,8 @@ import android.text.TextUtils;
 
 import java.io.File;
 
+import cn.xdf.lubanplus.engine.EngineType;
+
 /**
  * author:fumm
  * Date : 2022/ 11/ 03 10:52
@@ -37,6 +39,7 @@ public class Furniture {
      * 压缩过程中产生异常时回调
      */
     private Exception exception;
+
 
 
     public Furniture(File srcFile) {
@@ -156,17 +159,30 @@ public class Furniture {
         /**
          * 设置是否保留图片的Alpha通道
          */
-        private boolean focusAlpha;
+        private boolean focusAlpha = true;
 
         /**
          * 设置 图片压缩质量
          */
-        private int quality;
+        private int quality = 60;
 
-        public CompressConfig(String targetDir, boolean focusAlpha, int quality) {
-            this.targetDir = targetDir;
-            this.focusAlpha = focusAlpha;
-            this.quality = quality;
+        /**
+         * 压缩引擎类型
+         */
+        private int engineType = EngineType.LUBAN_ENGINE;
+
+        /**
+         * 最大尺寸
+         */
+        private int maxSize;
+
+        private int maxWidth;
+
+        private int maxHeight;
+
+
+        public CompressConfig() {
+
         }
 
         public String getTargetDir(Context context) {
@@ -194,6 +210,38 @@ public class Furniture {
 
         public void setQuality(int quality) {
             this.quality = quality;
+        }
+
+        public int getMaxSize() {
+            return maxSize;
+        }
+
+        public void setMaxSize(int maxSize) {
+            this.maxSize = maxSize;
+        }
+
+        public int getMaxWidth() {
+            return maxWidth;
+        }
+
+        public void setMaxWidth(int maxWidth) {
+            this.maxWidth = maxWidth;
+        }
+
+        public int getMaxHeight() {
+            return maxHeight;
+        }
+
+        public void setMaxHeight(int maxHeight) {
+            this.maxHeight = maxHeight;
+        }
+
+        public int getEngineType() {
+            return engineType;
+        }
+
+        public void setEngineType(int engineType) {
+            this.engineType = engineType;
         }
     }
 }

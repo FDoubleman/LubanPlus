@@ -21,6 +21,10 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
+import cn.xdf.lubanplus.engine.CustomEngine;
+import cn.xdf.lubanplus.engine.EngineType;
+import cn.xdf.lubanplus.engine.FastEngine;
+import cn.xdf.lubanplus.engine.IEngine;
 import cn.xdf.lubanplus.engine.SampleEngine;
 import cn.xdf.lubanplus.listener.ICompressListener;
 import cn.xdf.lubanplus.listener.IFilterListener;
@@ -73,11 +77,9 @@ public class LubanPlus {
         if (Checker.needCompress(mIgnoreCompressSize, path, mFilterListener)) {
             // 压缩图片
             Furniture beforeFur = new Furniture(new File(path));
-            Furniture.CompressConfig config = new Furniture.CompressConfig(mBuilder.mTargetDir,
-                    mBuilder.mFocusAlpha,mBuilder.mQuality);
-            beforeFur.setConfig(config);
+            beforeFur.setConfig(mBuilder.mConfig);
 
-            return new SampleEngine(mBuilder.mContext).compress(beforeFur).getTargetAbsolutePath();
+            return createEngine(mBuilder.mContext,mBuilder.mConfig.getEngineType()).compress(beforeFur).getTargetAbsolutePath();
         }
         Log.d("LuBanPlus", "get path is error! path:" + path);
         return path;
@@ -88,23 +90,20 @@ public class LubanPlus {
      *
      * @return 图片结果集合 ，对于多个图片压缩
      */
-    private Map<String,String> get() {
-       Map<String,String> resultMap = new HashMap<>();
+    private Map<String, String> get() {
+        Map<String, String> resultMap = new HashMap<>();
 
         Iterator<Furniture> iterable = mFurnitureList.iterator();
         while (iterable.hasNext()) {
             Furniture beforeFur = iterable.next();
-            Furniture.CompressConfig config = new Furniture.CompressConfig(mBuilder.mTargetDir,
-                    mBuilder.mFocusAlpha,mBuilder.mQuality);
-            beforeFur.setConfig(config);
-
+            beforeFur.setConfig(mBuilder.mConfig);
             if (Checker.needCompress(mIgnoreCompressSize,
                     beforeFur.getSrcAbsolutePath(), mFilterListener)) {
                 // 压缩图片
-                Furniture afterFur = new SampleEngine(mBuilder.mContext).compress(beforeFur);
-                resultMap.put(afterFur.getSrcAbsolutePath(),afterFur.getTargetAbsolutePath());
+                Furniture afterFur = createEngine(mBuilder.mContext,mBuilder.mEngineType).compress(beforeFur);
+                resultMap.put(afterFur.getSrcAbsolutePath(), afterFur.getTargetAbsolutePath());
             } else {
-                resultMap.put(beforeFur.getSrcAbsolutePath(),beforeFur.getSrcAbsolutePath());
+                resultMap.put(beforeFur.getSrcAbsolutePath(), beforeFur.getSrcAbsolutePath());
             }
             iterable.remove();
         }
@@ -113,8 +112,8 @@ public class LubanPlus {
     }
 
     private void launch() {
-        if(mFurnitureList.isEmpty()){
-           Log.d("LuBanPlus","launch image size is zero!");
+        if (mFurnitureList.isEmpty()) {
+            Log.d("LuBanPlus", "launch image size is zero!");
         }
         Handler handler = new Handler(Looper.getMainLooper(), new HandlerCall(mCompressListener));
         handler.sendMessage(handler.obtainMessage(MSG_COMPRESS_READY));
@@ -146,7 +145,7 @@ public class LubanPlus {
         CountDownLatch countDownLatch = new CountDownLatch(furnSize);
         for (Furniture beforeFurn : mFurnitureList) {
             Furniture.CompressConfig config = new Furniture.CompressConfig(mBuilder.mTargetDir,
-                    mBuilder.mFocusAlpha,mBuilder.mQuality);
+                    mBuilder.mFocusAlpha, mBuilder.mQuality);
             beforeFurn.setConfig(config);
             realLaunch(beforeFurn, handler, countDownLatch);
         }
@@ -154,7 +153,7 @@ public class LubanPlus {
     }
 
     // TODO 替换
-    private void obtain(Handler handler){
+    private void obtain(Handler handler) {
         Iterator<Furniture> iterable = mFurnitureList.iterator();
         int furnSize = mFurnitureList.size();
         // 1、检查过滤
@@ -179,6 +178,22 @@ public class LubanPlus {
     private void realLaunch(Furniture beforeFurn, Handler handler, CountDownLatch countDownLatch) {
         mExecutor.execute(new CompressTask(mBuilder.mContext, beforeFurn,
                 handler, countDownLatch));
+    }
+
+    /**
+     * 根据EngineType 创建Engine
+     * @param context context
+     * @param type type
+     * @return IEngine
+     */
+    private IEngine createEngine(Context context,@EngineType int type){
+        if(type == EngineType.CUSTOM_ENGINE){
+            return new CustomEngine(context);
+        }else if(type == EngineType.FAST_ENGINE){
+            return new FastEngine(context);
+        }else {
+            return new SampleEngine(context);
+        }
     }
 
 
@@ -231,16 +246,18 @@ public class LubanPlus {
         private Context mContext;
         private List<Furniture> mFurnitureList;
 
-        private String mTargetDir;
+
         private int mIgnoreCompressSize = 100;
-        private boolean mFocusAlpha = true;
-        private int mQuality = 60;
+
+
         private ICompressListener mCompressListener;
         private IFilterListener mFilterListener;
+        private Furniture.CompressConfig mConfig;
 
         private Builder(Context context) {
             mContext = context;
             mFurnitureList = new ArrayList<>();
+            mConfig = new Furniture.CompressConfig();
         }
 
         private LubanPlus build() {
@@ -290,7 +307,7 @@ public class LubanPlus {
 
         @Override
         public IBuilder setTargetDir(String targetDir) {
-            mTargetDir = targetDir;
+            mConfig.setTargetDir(targetDir);
             return this;
         }
 
@@ -302,7 +319,7 @@ public class LubanPlus {
 
         @Override
         public IBuilder setFocusAlpha(boolean focusAlpha) {
-            mFocusAlpha = focusAlpha;
+            mConfig.setFocusAlpha(focusAlpha);
             return this;
         }
 
@@ -311,7 +328,13 @@ public class LubanPlus {
             if (quality <= 0 || quality > 100) {
                 throw new IllegalArgumentException();
             }
-            mQuality = quality;
+            mConfig.setQuality(quality);
+            return this;
+        }
+
+        @Override
+        public IBuilder setEngineType(@EngineType int type) {
+            mConfig.setEngineType(type);
             return this;
         }
 
@@ -333,7 +356,7 @@ public class LubanPlus {
         }
 
         @Override
-        public Map<String,String> get() {
+        public Map<String, String> get() {
             return build().get();
         }
 

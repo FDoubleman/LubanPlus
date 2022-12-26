@@ -2,6 +2,7 @@ package cn.xdf.lubanplus.engine;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
 import android.text.TextUtils;
@@ -120,5 +121,24 @@ public abstract class BaseEngine implements IEngine {
                 (int) (Math.random() * 1000) +
                 (TextUtils.isEmpty(suffix) ? ".jpg" : "." + suffix);
         return new File(cacheBuilder);
+    }
+
+    /**
+     * obtain the image's width and height
+     *
+     * @param imagePath the path of image
+     */
+    public  int[] getImageSize(String imagePath) {
+        int[] res = new int[2];
+
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        options.inSampleSize = 1;
+        BitmapFactory.decodeFile(imagePath, options);
+
+        res[0] = options.outWidth;
+        res[1] = options.outHeight;
+
+        return res;
     }
 }

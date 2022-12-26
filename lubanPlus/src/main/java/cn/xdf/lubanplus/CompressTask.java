@@ -13,6 +13,10 @@ import android.util.Log;
 import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
 
+import cn.xdf.lubanplus.engine.CustomEngine;
+import cn.xdf.lubanplus.engine.EngineType;
+import cn.xdf.lubanplus.engine.FastEngine;
+import cn.xdf.lubanplus.engine.IEngine;
 import cn.xdf.lubanplus.engine.SampleEngine;
 
 /**
@@ -56,12 +60,25 @@ public class CompressTask implements Runnable {
     }
 
     public Furniture compress(Context context, Furniture before) {
-        return getEngine(context).compress(before);
+        int engineType = before.getConfig().getEngineType();
+        return createEngine(context, engineType).compress(before);
     }
 
 
-    private SampleEngine getEngine(Context context) {
-        // TODO 使用ThreadLocal 处理
-        return new SampleEngine(context);
+    /**
+     * 根据EngineType 创建Engine
+     *
+     * @param context context
+     * @param type    type
+     * @return IEngine
+     */
+    private IEngine createEngine(Context context,int type) {
+        if (type == EngineType.CUSTOM_ENGINE) {
+            return new CustomEngine(context);
+        } else if (type == EngineType.FAST_ENGINE) {
+            return new FastEngine(context);
+        } else {
+            return new SampleEngine(context);
+        }
     }
 }

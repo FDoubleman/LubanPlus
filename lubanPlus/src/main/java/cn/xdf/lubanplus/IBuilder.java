@@ -6,6 +6,7 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 
+import cn.xdf.lubanplus.engine.EngineType;
 import cn.xdf.lubanplus.listener.ICompressListener;
 import cn.xdf.lubanplus.listener.IFilterListener;
 
@@ -61,6 +62,12 @@ public interface IBuilder {
      */
     IBuilder setQuality(int quality);
 
+    /**
+     * 设置压缩 引擎类型
+     * @param type 引擎类型
+     * @return IBuilder
+     */
+    IBuilder setEngineType(@EngineType int type);
     /**
      * 设置是否需要 循环极致压缩到 最小值
      * @param need true：需要
