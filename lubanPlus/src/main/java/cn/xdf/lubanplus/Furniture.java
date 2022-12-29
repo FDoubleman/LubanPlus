@@ -98,6 +98,7 @@ public class Furniture {
     }
 
     public void setConfig(CompressConfig config) {
+
         this.config = config;
     }
 
@@ -243,5 +244,6 @@ public class Furniture {
         public void setEngineType(int engineType) {
             this.engineType = engineType;
         }
+
     }
 }

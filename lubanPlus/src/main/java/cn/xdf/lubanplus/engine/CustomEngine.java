@@ -22,7 +22,6 @@ public class CustomEngine extends BaseEngine {
 
     @Override
     public Furniture realCompress(Furniture src) {
-
         try {
             return customCompress(src);
         } catch (IOException e) {

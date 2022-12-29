@@ -100,7 +100,8 @@ public class LubanPlus {
             if (Checker.needCompress(mIgnoreCompressSize,
                     beforeFur.getSrcAbsolutePath(), mFilterListener)) {
                 // 压缩图片
-                Furniture afterFur = createEngine(mBuilder.mContext,mBuilder.mEngineType).compress(beforeFur);
+                Furniture.CompressConfig config = mBuilder.mConfig;
+                Furniture afterFur = createEngine(mBuilder.mContext,config.getEngineType()).compress(beforeFur);
                 resultMap.put(afterFur.getSrcAbsolutePath(), afterFur.getTargetAbsolutePath());
             } else {
                 resultMap.put(beforeFur.getSrcAbsolutePath(), beforeFur.getSrcAbsolutePath());
@@ -144,9 +145,7 @@ public class LubanPlus {
 
         CountDownLatch countDownLatch = new CountDownLatch(furnSize);
         for (Furniture beforeFurn : mFurnitureList) {
-            Furniture.CompressConfig config = new Furniture.CompressConfig(mBuilder.mTargetDir,
-                    mBuilder.mFocusAlpha, mBuilder.mQuality);
-            beforeFurn.setConfig(config);
+            beforeFurn.setConfig(mBuilder.mConfig);
             realLaunch(beforeFurn, handler, countDownLatch);
         }
         mFurnitureList.clear();
@@ -245,10 +244,7 @@ public class LubanPlus {
     public static final class Builder implements IBuilder {
         private Context mContext;
         private List<Furniture> mFurnitureList;
-
-
         private int mIgnoreCompressSize = 100;
-
 
         private ICompressListener mCompressListener;
         private IFilterListener mFilterListener;
@@ -324,13 +320,33 @@ public class LubanPlus {
         }
 
         @Override
-        public IBuilder setQuality(int quality) {
-            if (quality <= 0 || quality > 100) {
-                throw new IllegalArgumentException();
-            }
-            mConfig.setQuality(quality);
+        public IBuilder setMaxSize(int maxSize) {
+            mConfig.setMaxSize(maxSize);
             return this;
         }
+
+        @Override
+        public IBuilder setMaxWidth(int maxWidth) {
+            mConfig.setMaxWidth(maxWidth);
+            return this;
+        }
+
+        @Override
+        public IBuilder setMaxHeight(int maxHeight) {
+            mConfig.setMaxHeight(maxHeight);
+            return this;
+        }
+
+//        @Override
+//        public IBuilder setQuality(int quality) {
+//            if (quality <= 0 || quality > 100) {
+//                throw new IllegalArgumentException();
+//            }
+//            mConfig.setQuality(quality);
+//            return this;
+//        }
+
+
 
         @Override
         public IBuilder setEngineType(@EngineType int type) {

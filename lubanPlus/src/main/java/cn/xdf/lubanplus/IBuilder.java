@@ -56,11 +56,22 @@ public interface IBuilder {
     IBuilder setFocusAlpha(boolean focusAlpha);
 
     /**
+     * 设置压缩后的最大size,
+     * @param maxSize maxSize 单位KB
+     * @return IBuilder
+     */
+    IBuilder setMaxSize(int maxSize);
+
+    IBuilder setMaxWidth(int maxWidth);
+
+    IBuilder setMaxHeight(int maxHeight);
+
+    /**
      * 设置 图片压缩质量
      * @param quality setQuality 范围 0--100
      * @return IBuilder
      */
-    IBuilder setQuality(int quality);
+//    IBuilder setQuality(int quality);
 
     /**
      * 设置压缩 引擎类型
