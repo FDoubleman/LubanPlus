@@ -3,6 +3,7 @@ package cn.xdf.lubanplus;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -173,7 +174,61 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void fastCompress() {
+        LubanPlus.with(this)
+                .load(mOriginalImages)
+                .setEngineType(EngineType.FAST_ENGINE)
+                .setIgnoreBy(100)
+                .setFilterListener(new IFilterListener() {
+                    @Override
+                    public boolean isFilter(Furniture furn) {
+                        // 是否压缩过滤，true:过滤不压缩
+                        String srcPath = furn.getSrcAbsolutePath();
+                        return (TextUtils.isEmpty(srcPath) || srcPath.toLowerCase().endsWith(".gif"));
+                    }
+                })
+                // .setCompressListener(new CompressListenerImp())
+                .setCompressListener(new ICompressListener() {
 
+                    @Override
+                    public void onReady() {
+                        Log.d("LubanPlus", "onReady");
+                    }
+
+                    @Override
+                    public void onStart(String path) {
+                        //  每个文件开始压缩前调用
+                        Log.d("LubanPlus", "onStart:" + path);
+                    }
+
+                    @Override
+                    public void onEnd(String srcPath, String compressPath) {
+                        //  每个文件开始压缩成功调用
+                        File file;
+                        if (!TextUtils.isEmpty(compressPath)) {
+                            file = new File(compressPath);
+                        } else {
+                            file = new File("");
+                        }
+                        Log.d("LubanPlus", "onEnd :srcPath path: " + srcPath +
+                                " --> target path:" + compressPath +
+                                "   compressPath file size :" + file.length() / 1024.0 + "K");
+                    }
+
+                    @Override
+                    public void onError(String srcPath, Exception exception) {
+                        //  每个文件开始压缩失败调用
+                        Log.d("LubanPlus", "onError srcPath :" + srcPath +
+                                " -- exception : " + exception.toString());
+                    }
+
+                    @Override
+                    public void onFinish(HashMap<String, String> resultMap) {
+                        //  所有文件开始压缩完成
+                        Log.d("LubanPlus", "onFinish : " + resultMap.size());
+                        loadCompressImage(resultMap);
+                    }
+                })
+                .launch();
     }
 
     private void customCompress() {
@@ -339,8 +394,12 @@ public class MainActivity extends AppCompatActivity {
 
 
     private String getFileText(File file) {
-        return "路径：" + file.getAbsolutePath() + "\r\n" + "尺寸：" + (file.length()) / 1024 + "KB";
+        int[] size = getImageSize(file.getAbsolutePath());
+        return "路径：" + file.getAbsolutePath() + "\r\n" +
+                "尺寸：" + (file.length()) / 1024 + "KB" +
+                " -- 宽：" + size[0] + " --高：" + size[1];
     }
+
 
     private void initPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
@@ -352,5 +411,19 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION));
             }
         }
+    }
+
+    public int[] getImageSize(String imagePath) {
+        int[] res = new int[2];
+
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        options.inSampleSize = 1;
+        BitmapFactory.decodeFile(imagePath, options);
+
+        res[0] = options.outWidth;
+        res[1] = options.outHeight;
+
+        return res;
     }
 }
