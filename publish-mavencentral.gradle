@@ -1,6 +1,7 @@
 apply plugin: 'maven-publish'
 apply plugin: 'signing'
-
+// 1、执行 Gradle Lubanplus - Tasks - build - assemble
+// 2、执行 Gradle Lubanplus - Tasks - publishing - publishAllPublicationsToLubanPlusRepository
 task androidSourcesJar(type: Jar) {
     classifier = 'sources'
     from android.sourceSets.main.java.source
@@ -13,7 +14,7 @@ task androidSourcesJar(type: Jar) {
 ext {path=
         PUBLISH_GROUP_ID = 'io.github.FDoubleman'
     PUBLISH_ARTIFACT_ID = 'LubanPlus'
-    PUBLISH_VERSION = '1.0.1'
+    PUBLISH_VERSION = '1.0.2'
 }
 
 //--- 修改配置二 ---
