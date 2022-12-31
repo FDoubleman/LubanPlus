@@ -24,9 +24,9 @@
 | 缓存压缩图片路径 |支持  |支持  |  |
 | 异步压缩回调 |支持  |支持  |  |
 | 压缩前重命名接口 |支持  |不支持  |待确认使用常见后添加  |
-|压缩方式选择or自定义  | 不支持 |支持  |待完善丰富  |
+|压缩方式选择or自定义  | 不支持 |支持  |  |
 | 多线程并发压缩 |不支持  |支持  |核心线程数为3，并行压缩  |
-| 循环极致压缩 |不支持  |不支持  | 功能待验证后开放 |
+| 循环极致压缩 |不支持  |支持  | 参考快速压缩模式 |
 | Issues和功能处理 |不支持  |支持  |  |
 
 
@@ -44,25 +44,28 @@
 
 ## 导入
 ```sh
-implementation 'io.github.FDoubleman:LubanPlus:1.0.1'
+implementation 'io.github.FDoubleman:LubanPlus:1.0.2'
 ```
 ## 使用
 
 ### 方法列表
 
-| 方法 | 描述 |
-| --- | --- |
-| load | 传入图片path、图片File、图片Uri  |
-|  get()|同步多图片压缩，配合load(list)  |
-|  get(String path)|同步单图片压缩  |
-|  launch()|异步压缩  |
-| setTargetDir | 缓存压缩图片路径 |
-|  setIgnoreBy| 不压缩的阈值，单位为K |
-|  setFocusAlpha|设置是否保留透明通道  |
-|  setQuality| 压缩的质量,0-100 默认60 |
-|  setCompressListener| 异步压缩回调 |
-|  setFilterListener| 压缩过滤监听 |
-
+| 方法 | 描述 |备注 |
+| --- | --- |--- |
+| load | 传入图片path、图片File、图片Uri  | |
+|  get()|同步多图片压缩，配合load(list)  | |
+|  get(String path)|同步单图片压缩  | |
+|  launch()|异步压缩  | |
+| setTargetDir | 缓存压缩图片路径 | |
+|  setIgnoreBy| 不压缩的阈值，单位为K | |
+|  setFocusAlpha|设置是否保留透明通道  |仅`LUBAN_ENGINE`模式支持 |
+|  setQuality| 压缩的质量,0-100 默认60 |仅`LUBAN_ENGINE`模式支持 |
+|  setCompressListener| 异步压缩回调 | |
+|  setFilterListener| 压缩过滤监听 | |
+|  ==setEngineType==| 设置压缩Engine类型 |`FAST_ENGINE`：极速模式     `LUBAN_ENGINE`：默认鲁班模式 `CUSTOM_ENGINE`：自定义模式    |
+|  ==setMaxSize==| 设置压缩后的最大size |`CUSTOM_ENGINE` 模式下使用|
+|  ==setMaxWidth==| 压缩后最大宽度 |`CUSTOM_ENGINE` 模式下使用 |
+|  ==setMaxHeight==| 压缩后最大高度 |`CUSTOM_ENGINE` 模式下使用 |
 ### 参数效果图
 
 ` 注意：png图片格式压缩设置 setFocusAlpha(false) ,会导致的透明背景变成黑色，使用时注意！ `
@@ -189,6 +192,23 @@ String targetFile = LubanPlus.with(this)
     .get(srcFile.getAbsolutePath());
 Log.d("LubanPlus", "testGet : " +targetFile);
 ```
+## 版本日志
+#### 1.0.2版本
+- 参考 [issues/2](https://github.com/FDoubleman/LubanPlus/issues/2) 建议，添加设置`压缩后的文件最大值`功能
+- 参考 [AdvancedLuban](https://github.com/jackyHuangH/AdvancedLuban) 设计`三种压缩Engine`,提供选择
+- 代码测试样例 `MainActivity` 页面UI重构，测试更加方便
+- 代码减少`Context`使用深度
+- 新增`4个API`,请参见标注`黄色Api`
+- 相关代码优化等
+
+#### 1.0.1版本
+- 最基础版本，在Luban基础上完善开发封装
+- 提供压缩框架Api
+- 实现最基础压缩功能
+- 实现异步并发3线程压缩
+- 部分功能等...
+
+
 ## About issues
 
 `关于issuse请参考如下模板：`
