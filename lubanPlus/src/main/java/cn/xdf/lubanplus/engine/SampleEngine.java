@@ -21,9 +21,7 @@ import cn.xdf.lubanplus.Furniture;
 public class SampleEngine extends BaseEngine {
 
 
-    public SampleEngine(Context context) {
-        // TODO context 去除
-        super(context);
+    public SampleEngine() {
     }
 
     @Override
@@ -41,7 +39,7 @@ public class SampleEngine extends BaseEngine {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         // format : png 格式 保留 Alpha 通道 ，jpeg：格式不支持 Alpha通道
         // quality : png 设置无效\
-        Furniture.CompressConfig compressConfig =furni.getConfig();
+        Furniture.CompressConfig compressConfig = furni.getConfig();
         boolean focusAlpha = compressConfig.isFocusAlpha();
         int quality = compressConfig.getQuality();
 

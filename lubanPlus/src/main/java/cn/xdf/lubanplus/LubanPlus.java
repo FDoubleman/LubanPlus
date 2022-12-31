@@ -79,7 +79,7 @@ public class LubanPlus {
             Furniture beforeFur = new Furniture(new File(path));
             beforeFur.setConfig(mBuilder.mConfig);
 
-            return createEngine(mBuilder.mContext,mBuilder.mConfig.getEngineType()).compress(beforeFur).getTargetAbsolutePath();
+            return createEngine(mBuilder.mConfig.getEngineType()).compress(beforeFur).getTargetAbsolutePath();
         }
         Log.d("LuBanPlus", "get path is error! path:" + path);
         return path;
@@ -101,7 +101,7 @@ public class LubanPlus {
                     beforeFur.getSrcAbsolutePath(), mFilterListener)) {
                 // 压缩图片
                 Furniture.CompressConfig config = mBuilder.mConfig;
-                Furniture afterFur = createEngine(mBuilder.mContext,config.getEngineType()).compress(beforeFur);
+                Furniture afterFur = createEngine(config.getEngineType()).compress(beforeFur);
                 resultMap.put(afterFur.getSrcAbsolutePath(), afterFur.getTargetAbsolutePath());
             } else {
                 resultMap.put(beforeFur.getSrcAbsolutePath(), beforeFur.getSrcAbsolutePath());
@@ -175,23 +175,22 @@ public class LubanPlus {
     }
 
     private void realLaunch(Furniture beforeFurn, Handler handler, CountDownLatch countDownLatch) {
-        mExecutor.execute(new CompressTask(mBuilder.mContext, beforeFurn,
-                handler, countDownLatch));
+        mExecutor.execute(new CompressTask(beforeFurn, handler, countDownLatch));
     }
 
     /**
      * 根据EngineType 创建Engine
-     * @param context context
+     *
      * @param type type
      * @return IEngine
      */
-    private IEngine createEngine(Context context,@EngineType int type){
-        if(type == EngineType.CUSTOM_ENGINE){
-            return new CustomEngine(context);
-        }else if(type == EngineType.FAST_ENGINE){
-            return new FastEngine(context);
-        }else {
-            return new SampleEngine(context);
+    private IEngine createEngine(@EngineType int type) {
+        if (type == EngineType.CUSTOM_ENGINE) {
+            return new CustomEngine();
+        } else if (type == EngineType.FAST_ENGINE) {
+            return new FastEngine();
+        } else {
+            return new SampleEngine();
         }
     }
 
@@ -242,18 +241,18 @@ public class LubanPlus {
      * 如果想了解 更多的 注释和方法 请 阅读  IBuilder
      */
     public static final class Builder implements IBuilder {
-        private Context mContext;
         private List<Furniture> mFurnitureList;
         private int mIgnoreCompressSize = 100;
-
         private ICompressListener mCompressListener;
         private IFilterListener mFilterListener;
         private Furniture.CompressConfig mConfig;
+        private Context mContext;
 
         private Builder(Context context) {
             mContext = context;
             mFurnitureList = new ArrayList<>();
-            mConfig = new Furniture.CompressConfig();
+            String targetDir = FileUtils.getDefaultTargetDir(context);
+            mConfig = new Furniture.CompressConfig(targetDir);
         }
 
         private LubanPlus build() {
@@ -345,7 +344,6 @@ public class LubanPlus {
             mConfig.setQuality(quality);
             return this;
         }
-
 
 
         @Override

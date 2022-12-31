@@ -16,8 +16,8 @@ import cn.xdf.lubanplus.Furniture;
 public class FastEngine extends BaseEngine {
     private ByteArrayOutputStream mByteArrayOutputStream;
 
-    public FastEngine(Context context) {
-        super(context);
+    public FastEngine() {
+
     }
 
     @Override

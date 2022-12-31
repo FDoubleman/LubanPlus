@@ -19,6 +19,24 @@ import java.io.OutputStream;
  **/
 public class FileUtils {
     public static final int DEFAULT_BUFFER_SIZE = 1024 * 4;
+    private static final String sCacheFileDirName = "LuBanPlus";
+
+    /**
+     * 删除文件 or 文件夹
+     * @param fileOrDirectory fileOrDirectory
+     */
+    public static void deleteFile(File fileOrDirectory) {
+        if (fileOrDirectory.isDirectory()) {
+            for (File file : fileOrDirectory.listFiles()) {
+                deleteFile(file);
+            }
+        }
+        fileOrDirectory.delete();
+    }
+
+    public static String getDefaultTargetDir(Context context){
+        return  context.getCacheDir().getAbsolutePath() + File.separator + sCacheFileDirName;
+    }
 
     /**
      * 通过 url 转换成File方法；

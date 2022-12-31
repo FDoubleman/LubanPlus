@@ -24,15 +24,13 @@ import cn.xdf.lubanplus.engine.SampleEngine;
  */
 public class CompressTask implements Runnable {
 
-    private final Context mContext;
     private final Handler mHandler;
     private final Furniture mFurn;
     private final CountDownLatch mCountDown;
 
-    public CompressTask(Context context, Furniture furn, Handler handler, CountDownLatch countDownLatch) {
+    public CompressTask( Furniture furn, Handler handler, CountDownLatch countDownLatch) {
         this.mHandler = handler;
         this.mFurn = furn;
-        this.mContext = context;
         this.mCountDown = countDownLatch;
     }
 
@@ -40,7 +38,7 @@ public class CompressTask implements Runnable {
     public void run() {
         try {
             mHandler.sendMessage(mHandler.obtainMessage(MSG_COMPRESS_START, mFurn));
-            Furniture furn = compress(mContext, mFurn);
+            Furniture furn = compress(mFurn);
             if (furn.getTargetFile() == null) {
                 mFurn.setException(new IOException("LuBanPlus compress Image IO Exception!"));
                 mHandler.sendMessage(mHandler.obtainMessage(MSG_COMPRESS_ERROR, mFurn));
@@ -59,26 +57,25 @@ public class CompressTask implements Runnable {
         }
     }
 
-    public Furniture compress(Context context, Furniture before) {
+    public Furniture compress(Furniture before) {
         int engineType = before.getConfig().getEngineType();
-        return createEngine(context, engineType).compress(before);
+        return createEngine(engineType).compress(before);
     }
 
 
     /**
      * 根据EngineType 创建Engine
      *
-     * @param context context
      * @param type    type
      * @return IEngine
      */
-    private IEngine createEngine(Context context,int type) {
+    private IEngine createEngine(int type) {
         if (type == EngineType.CUSTOM_ENGINE) {
-            return new CustomEngine(context);
+            return new CustomEngine();
         } else if (type == EngineType.FAST_ENGINE) {
-            return new FastEngine(context);
+            return new FastEngine();
         } else {
-            return new SampleEngine(context);
+            return new SampleEngine();
         }
     }
 }

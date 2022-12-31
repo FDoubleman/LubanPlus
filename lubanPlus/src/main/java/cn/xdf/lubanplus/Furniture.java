@@ -151,7 +151,7 @@ public class Furniture {
      * 图片压缩配置信息
      */
     public static class CompressConfig {
-        private static final String sCacheFileDirName = "LuBanPlus";
+
         /**
          * 目标文件夹
          */
@@ -182,15 +182,12 @@ public class Furniture {
         private int maxHeight;
 
 
-        public CompressConfig() {
-
+        public CompressConfig(String targetDir) {
+            this.targetDir = targetDir;
         }
 
-        public String getTargetDir(Context context) {
-            if (!TextUtils.isEmpty(targetDir)) {
-                return targetDir;
-            }
-            return context.getCacheDir().getAbsolutePath() + "/" + sCacheFileDirName;
+        public String getTargetDir() {
+            return targetDir;
         }
 
         public void setTargetDir(String targetDir) {

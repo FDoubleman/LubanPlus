@@ -16,8 +16,7 @@ import cn.xdf.lubanplus.Furniture;
 public class CustomEngine extends BaseEngine {
     private ByteArrayOutputStream mByteArrayOutputStream;
 
-    public CustomEngine(Context context) {
-        super(context);
+    public CustomEngine() {
     }
 
     @Override

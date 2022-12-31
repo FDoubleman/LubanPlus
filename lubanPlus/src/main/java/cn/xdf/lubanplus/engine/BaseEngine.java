@@ -21,10 +21,9 @@ import cn.xdf.lubanplus.Furniture;
  * 图片压缩可能使用到的通用 公共方法  ，位于此
  **/
 public abstract class BaseEngine implements IEngine {
-    protected Context context;
 
-    public BaseEngine(Context context) {
-        this.context = context.getApplicationContext();
+
+    public BaseEngine() {
     }
 
     @Override
@@ -109,7 +108,7 @@ public abstract class BaseEngine implements IEngine {
      */
     public File getImageCacheFile(Furniture furni) {
         String suffix = Checker.getSuffix(furni.getSrcFile());
-        String targetDir = furni.getConfig().getTargetDir(context);
+        String targetDir = furni.getConfig().getTargetDir();
 
         File file = new File(targetDir);
         if (!file.exists()) {
