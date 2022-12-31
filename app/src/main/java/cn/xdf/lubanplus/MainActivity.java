@@ -33,6 +33,7 @@ import cn.xdf.lubanplus.listener.IFilterListener;
 
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.EditText;
 import android.widget.RadioGroup;
 
 import java.io.File;
@@ -232,7 +233,32 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void customCompress() {
+        String targetDir = getExternalCacheDir().getAbsolutePath();
+        // android 11 及以后的版本 error ：open failed: EACCES (Permission denied)
+        // 更多信息：https://stackoverflow.com/questions/8854359/exception-open-failed-eacces-permission-denied-on-android
+        //         https://developer.android.com/training/data-storage#scoped-storage
+        // String targetDir = Environment.getDownloadCacheDirectory().getAbsolutePath();
+        int maxsize = getSizeByInput(binding.etMaxSize);
+        int maxHeight = getSizeByInput(binding.etMaxHeight);
+        int maxWidth =getSizeByInput(binding.etMaxWidth);
 
+        LubanPlus.with(this)
+                .load(mOriginalImages)
+                .setEngineType(EngineType.CUSTOM_ENGINE)
+                .setMaxHeight(maxHeight)
+                .setMaxWidth(maxWidth)
+                .setMaxSize(maxsize)
+                .setIgnoreBy(100)
+                .setCompressListener(new CompressListenerImp() {
+                    @Override
+                    public void onFinish(HashMap<String, String> resultMap) {
+                        super.onFinish(resultMap);
+                        //  所有文件开始压缩完成
+                        Log.d("LubanPlus", "onFinish : " + resultMap.size());
+                        loadCompressImage(resultMap);
+                    }
+                })
+                .launch();
     }
 
     private void customSizeEnable(boolean enable) {
@@ -425,5 +451,16 @@ public class MainActivity extends AppCompatActivity {
         res[1] = options.outHeight;
 
         return res;
+    }
+
+    private int getSizeByInput(EditText editText) {
+        String content = editText.getText().toString();
+        int size = -1;
+        try {
+            size = Integer.parseInt(content);
+        } catch (NumberFormatException formatException) {
+            formatException.printStackTrace();
+        }
+        return size;
     }
 }

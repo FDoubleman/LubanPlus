@@ -56,6 +56,7 @@
             android:textStyle="bold" />
 
         <LinearLayout
+            tools:visibility="visible"
             android:visibility="invisible"
             android:id="@+id/ll_custom_layout"
             android:layout_width="match_parent"
@@ -70,6 +71,9 @@
                 android:textSize="14sp" />
 
             <EditText
+                android:id="@+id/et_max_size"
+                android:maxLines="1"
+                android:inputType="number"
                 android:layout_width="80dp"
                 android:layout_height="wrap_content"
                 android:hint="单位kb"
@@ -83,6 +87,9 @@
                 android:textSize="14sp" />
 
             <EditText
+                android:id="@+id/et_max_width"
+                android:maxLines="1"
+                android:inputType="number"
                 android:layout_width="50dp"
                 android:layout_height="wrap_content"
                 android:hint="0000"
@@ -96,6 +103,9 @@
                 android:textSize="14sp" />
 
             <EditText
+                android:id="@+id/et_max_height"
+                android:maxLines="1"
+                android:inputType="number"
                 android:layout_width="50dp"
                 android:layout_height="wrap_content"
                 android:hint="0000"
