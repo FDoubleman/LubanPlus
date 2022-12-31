@@ -3,6 +3,7 @@ package cn.xdf.lubanplus;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -24,12 +25,14 @@ import androidx.navigation.ui.NavigationUI;
 import cn.xdf.lubanplus.compress.IImageCompressListener;
 import cn.xdf.lubanplus.compress.ImageCompress;
 import cn.xdf.lubanplus.databinding.ActivityMainBinding;
+import cn.xdf.lubanplus.engine.EngineType;
 import cn.xdf.lubanplus.listener.CompressListenerImp;
 import cn.xdf.lubanplus.listener.ICompressListener;
 import cn.xdf.lubanplus.listener.IFilterListener;
 
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.RadioGroup;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -42,8 +45,12 @@ import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
-    private AppBarConfiguration appBarConfiguration;
     private ActivityMainBinding binding;
+    private int compress_model = COMPRESS_MODEL_LUBAN;
+    private static final int COMPRESS_MODEL_LUBAN = 100;
+    private static final int COMPRESS_MODEL_FAST = 101;
+    private static final int COMPRESS_MODEL_CUSTOM = 102;
+    private List<File> mOriginalImages = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,56 +58,147 @@ public class MainActivity extends AppCompatActivity {
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
-        setSupportActionBar(binding.toolbar);
-
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
-        appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
-        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
-
-        binding.fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-//                createTestImageFile("test_1.png");
-//                createTestImageFile("test_2.jpeg");
-//                createTestImageFile("test_5.png");
-//                createTestImageFile("test_7.jpg");
-//                createTestImageFile("test_8.jpg");
-                testLaunch();
-            }
-        });
+        initRadioModel();
+        initCreateImage();
+        initCompress();
         initPermission();
     }
 
+
+    private void initRadioModel() {
+        binding.rgModel.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup radioGroup, int id) {
+                if (id == R.id.rb_luban) {
+                    customSizeEnable(false);
+                    compress_model = COMPRESS_MODEL_LUBAN;
+                } else if (id == R.id.rb_fast) {
+                    customSizeEnable(false);
+                    compress_model = COMPRESS_MODEL_FAST;
+                } else if (id == R.id.rb_custom) {
+                    customSizeEnable(true);
+                    compress_model = COMPRESS_MODEL_CUSTOM;
+                } else {
+                    Log.d("LubanPlus", "id not support");
+                }
+            }
+        });
+    }
+
+
+    private void initCreateImage() {
+        binding.btnCreateImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                create();
+            }
+        });
+    }
+
+    private void create() {
+        File imageFile1 = createTestImageFile("test_1.png");
+        File imageFile2 = createTestImageFile("test_2.jpeg");
+        File imageFile3 = createTestImageFile("test_5.png");
+//        createTestImageFile("test_7.jpg");
+//        createTestImageFile("test_8.jpg");
+
+        if (imageFile1 != null) {
+            binding.ivOriginal1.setImageURI(Uri.fromFile(imageFile1));
+            binding.tvPathOriginal1.setText(getFileText(imageFile1));
+            mOriginalImages.add(imageFile1);
+        }
+        if (imageFile2 != null) {
+            binding.ivOriginal2.setImageURI(Uri.fromFile(imageFile2));
+            binding.tvPathOriginal2.setText(getFileText(imageFile2));
+            mOriginalImages.add(imageFile2);
+        }
+        if (imageFile3 != null) {
+            binding.ivOriginal3.setImageURI(Uri.fromFile(imageFile3));
+            binding.tvPathOriginal3.setText(getFileText(imageFile3));
+            mOriginalImages.add(imageFile3);
+        }
+    }
+
+    private void initCompress() {
+        binding.btnCompress.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                compress();
+            }
+        });
+    }
+
+    private void loadCompressImage(HashMap<String, String> compressResult) {
+        String originalImage1 = mOriginalImages.get(0).getAbsolutePath();
+        String originalImage2 = mOriginalImages.get(1).getAbsolutePath();
+        String originalImage3 = mOriginalImages.get(2).getAbsolutePath();
+
+        String compressImage1 = compressResult.get(originalImage1);
+        String compressImage2 = compressResult.get(originalImage2);
+        String compressImage3 = compressResult.get(originalImage3);
+
+        File compressFile1 = new File(compressImage1);
+        File compressFile2 = new File(compressImage2);
+        File compressFile3 = new File(compressImage3);
+
+
+        binding.ivCompress1.setImageURI(Uri.fromFile(compressFile1));
+        binding.tvPathCompress1.setText(getFileText(compressFile1));
+
+        binding.ivCompress2.setImageURI(Uri.fromFile(compressFile2));
+        binding.tvPathCompress2.setText(getFileText(compressFile2));
+
+        binding.ivCompress3.setImageURI(Uri.fromFile(compressFile3));
+        binding.tvPathCompress3.setText(getFileText(compressFile3));
+    }
+
+    private void compress() {
+        if (compress_model == COMPRESS_MODEL_LUBAN) {
+            lubanCompress();
+        } else if (compress_model == COMPRESS_MODEL_FAST) {
+            fastCompress();
+        } else if (compress_model == COMPRESS_MODEL_CUSTOM) {
+            customCompress();
+        }
+    }
+
+
+    private void lubanCompress() {
+        // 方式 一
+        lubanPlusLaunch();
+        // 方式 二
+        // testGet();
+        // 方式 三
+        // testListGet();
+    }
+
+    private void fastCompress() {
+
+    }
+
+    private void customCompress() {
+
+    }
+
+    private void customSizeEnable(boolean enable) {
+        binding.llCustomLayout.setVisibility(enable ? View.VISIBLE : View.INVISIBLE);
+    }
 
     /**
      * 首先通过 createTestImageFile
      * 按需创建测试图片下面要使用到的图片
      * 之后验证测试异步压缩
      */
-    private void testLaunch() {
-        File srcFile1 = new File(getExternalFilesDir(null), "test_1.png");
-        File srcFile2 = new File(getExternalFilesDir(null), "test_2.jpeg");
-        File srcFile5 = new File(getExternalFilesDir(null), "test_5.png");
-        File srcFile7 = new File(getExternalFilesDir(null), "test_7.jpg");
-        File srcFile8 = new File(getExternalFilesDir(null), "test_8.jpg");
-
-        List<File> list = new ArrayList<>();
-        list.add(new File(""));
-        list.add(new File(""));
-        list.add(srcFile1);
-        list.add(srcFile2);
-        list.add(srcFile5);
-        list.add(srcFile7);
-        list.add(srcFile8);
-        String targetDir =getExternalCacheDir().getAbsolutePath();
+    private void lubanPlusLaunch() {
+        String targetDir = getExternalCacheDir().getAbsolutePath();
         // android 11 及以后的版本 error ：open failed: EACCES (Permission denied)
         // 更多信息：https://stackoverflow.com/questions/8854359/exception-open-failed-eacces-permission-denied-on-android
         //         https://developer.android.com/training/data-storage#scoped-storage
         // String targetDir = Environment.getDownloadCacheDirectory().getAbsolutePath();
         LubanPlus.with(this)
-                .load(list)
+                .load(mOriginalImages)
                 .setFocusAlpha(true)
+                .setEngineType(EngineType.LUBAN_ENGINE)
                 // .setTargetDir(targetDir)
                 .setQuality(80)
                 .setIgnoreBy(100)
@@ -122,35 +220,36 @@ public class MainActivity extends AppCompatActivity {
 
                     @Override
                     public void onStart(String path) {
-                        // TODO 每个文件开始压缩前调用
+                        //  每个文件开始压缩前调用
                         Log.d("LubanPlus", "onStart:" + path);
                     }
 
                     @Override
                     public void onEnd(String srcPath, String compressPath) {
-                        // TODO 每个文件开始压缩成功调用
+                        //  每个文件开始压缩成功调用
                         File file;
-                        if(!TextUtils.isEmpty(compressPath)){
+                        if (!TextUtils.isEmpty(compressPath)) {
                             file = new File(compressPath);
-                        }else{
+                        } else {
                             file = new File("");
                         }
                         Log.d("LubanPlus", "onEnd :srcPath path: " + srcPath +
-                                " --> target path:"+compressPath+
-                                "   compressPath file size :" + file.length()/1024.0 +"K");
+                                " --> target path:" + compressPath +
+                                "   compressPath file size :" + file.length() / 1024.0 + "K");
                     }
 
                     @Override
                     public void onError(String srcPath, Exception exception) {
-                        // TODO 每个文件开始压缩失败调用
+                        //  每个文件开始压缩失败调用
                         Log.d("LubanPlus", "onError srcPath :" + srcPath +
                                 " -- exception : " + exception.toString());
                     }
 
                     @Override
-                    public void onFinish(Map<String, String> resultMap) {
-                        // TODO 所有文件开始压缩完成
+                    public void onFinish(HashMap<String, String> resultMap) {
+                        //  所有文件开始压缩完成
                         Log.d("LubanPlus", "onFinish : " + resultMap.size());
+                        loadCompressImage(resultMap);
                     }
                 })
                 .launch();
@@ -161,9 +260,9 @@ public class MainActivity extends AppCompatActivity {
      * 按需创建测试图片下面要使用到的图片
      * 同步方法 压缩单个图片  测试类
      */
-    private void testGet() {
-        File srcFile = new File(getExternalFilesDir(null), "test_8.jpg");
-        String targetDir =getExternalCacheDir().getAbsolutePath();
+    private void lubanPlusGet() {
+        File srcFile = mOriginalImages.get(0);
+        String targetDir = getExternalCacheDir().getAbsolutePath();
         // String targetDir = Environment.getDownloadCacheDirectory().getAbsolutePath();
         // 单个图片同步压缩
         String targetFile = LubanPlus.with(this)
@@ -180,8 +279,11 @@ public class MainActivity extends AppCompatActivity {
                     }
                 })
                 .get(srcFile.getAbsolutePath());
-        Log.d("LubanPlus", "testGet : " +targetFile);
+        Log.d("LubanPlus", "testGet : " + targetFile);
+        HashMap<String, String> resultMap = new HashMap<>();
+        resultMap.put(srcFile.getAbsolutePath(), targetFile);
 
+        loadCompressImage(resultMap);
 
     }
 
@@ -190,20 +292,11 @@ public class MainActivity extends AppCompatActivity {
      * 按需创建测试图片下面要使用到的图片
      * 同步方法 压缩多个图片  测试类
      */
-    private void testListGet(){
-        String targetDir =getExternalCacheDir().getAbsolutePath();
-        File srcFile1 = new File(getExternalFilesDir(null), "test_1.png");
-        File srcFile2 = new File(getExternalFilesDir(null), "test_2.jpeg");
-        File srcFile5 = new File(getExternalFilesDir(null), "test_5.png");
+    private void lubanPlusList() {
+        String targetDir = getExternalCacheDir().getAbsolutePath();
 
-        // 多个图片同步压缩
-        List<File> list = new ArrayList<>();
-        list.add(srcFile1);
-        list.add(srcFile2);
-        list.add(new File(""));
-        list.add(srcFile5);
-        LubanPlus.with(this).setTargetDir(targetDir)
-                .load(list)
+        HashMap<String, String> result = (HashMap<String, String>) LubanPlus.with(this).setTargetDir(targetDir)
+                .load(mOriginalImages)
                 .setQuality(80)
                 .setIgnoreBy(100)
                 .setFocusAlpha(true)
@@ -215,18 +308,17 @@ public class MainActivity extends AppCompatActivity {
                         return (TextUtils.isEmpty(srcPath) || srcPath.toLowerCase().endsWith(".gif"));
                     }
                 }).get();
-        for (File file : list) {
-            Log.d("LubanPlus", "testGet : path---> "
-                    + file.getAbsolutePath() +"  size:" + file.length());
-        }
+
+        loadCompressImage(result);
     }
 
-    public void createTestImageFile(String assetsFileName) {
+    public File createTestImageFile(String assetsFileName) {
         InputStream is = null;
+        File file = null;
         try {
             is = getResources().getAssets().open(assetsFileName);
             // path : /storage/emulated/0/Android/data/cn.xdf.lubanplus/files/assetsFileName
-            File file = new File(getExternalFilesDir(null),assetsFileName );
+            file = new File(getExternalFilesDir(null), assetsFileName);
             Log.d("createTestImageFile", "file path: "
                     + file.getAbsolutePath());
             FileOutputStream fos = new FileOutputStream(file);
@@ -242,48 +334,13 @@ public class MainActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return file;
     }
 
-    public File getImageCacheFile(String suffix) {
-        String targetDir = Environment.getDataDirectory().getAbsolutePath() +
-                File.separator + "fmm";
 
-        String cacheBuilder = targetDir + "/" +
-                System.currentTimeMillis() +
-                (int) (Math.random() * 1000) +
-                (TextUtils.isEmpty(suffix) ? ".jpg" : "." + suffix);
-        return new File(cacheBuilder);
+    private String getFileText(File file) {
+        return "路径：" + file.getAbsolutePath() + "\r\n" + "尺寸：" + (file.length()) / 1024 + "KB";
     }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public boolean onSupportNavigateUp() {
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
-        return NavigationUI.navigateUp(navController, appBarConfiguration)
-                || super.onSupportNavigateUp();
-    }
-
 
     private void initPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {

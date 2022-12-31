@@ -1,6 +1,7 @@
 package cn.xdf.lubanplus.listener;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -39,5 +40,5 @@ public interface ICompressListener {
      * 图片list全部压缩完成之后的回调
      * @param resultMap 压缩结果
      */
-    void onFinish(Map<String,String> resultMap);
+    void onFinish(HashMap<String,String> resultMap);
 }

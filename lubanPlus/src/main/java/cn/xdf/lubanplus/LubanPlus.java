@@ -337,14 +337,14 @@ public class LubanPlus {
             return this;
         }
 
-//        @Override
-//        public IBuilder setQuality(int quality) {
-//            if (quality <= 0 || quality > 100) {
-//                throw new IllegalArgumentException();
-//            }
-//            mConfig.setQuality(quality);
-//            return this;
-//        }
+        @Override
+        public IBuilder setQuality(int quality) {
+            if (quality <= 0 || quality > 100) {
+                throw new IllegalArgumentException();
+            }
+            mConfig.setQuality(quality);
+            return this;
+        }
 
 
 

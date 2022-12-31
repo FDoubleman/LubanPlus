@@ -2,6 +2,7 @@ package cn.xdf.lubanplus.listener;
 
 import android.util.Log;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -34,7 +35,7 @@ public class CompressListenerImp implements ICompressListener{
     }
 
     @Override
-    public void onFinish(Map<String, String> resultMap) {
+    public void onFinish(HashMap<String, String> resultMap) {
         Log.d(Tag," onEnd: resultMap size :"+ resultMap.size());
     }
 

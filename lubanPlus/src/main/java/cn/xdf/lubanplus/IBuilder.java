@@ -71,7 +71,7 @@ public interface IBuilder {
      * @param quality setQuality 范围 0--100
      * @return IBuilder
      */
-//    IBuilder setQuality(int quality);
+    IBuilder setQuality(int quality);
 
     /**
      * 设置压缩 引擎类型
@@ -96,7 +96,7 @@ public interface IBuilder {
     /**
      * 同步方法 压缩多个文件方法
      *
-     * @return List<Furniture>
+     * @return Map<String,String>
      */
     Map<String,String> get();
 
