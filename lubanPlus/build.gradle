@@ -4,6 +4,7 @@ plugins {
 apply from: "${rootProject.projectDir}/publish-mavencentral.gradle"
 
 android {
+    namespace 'cn.xdf.lubanplus.lubanPlus'
     compileSdk 30
 
     defaultConfig {

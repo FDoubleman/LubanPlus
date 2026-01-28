@@ -3,6 +3,7 @@ plugins {
 }
 
 android {
+    namespace 'cn.xdf.lubanplus'
     compileSdk 30
 
     defaultConfig {

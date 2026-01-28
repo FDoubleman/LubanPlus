@@ -3,7 +3,7 @@ apply plugin: 'signing'
 // 1、执行 Gradle Lubanplus - Tasks - build - assemble
 // 2、执行 Gradle Lubanplus - Tasks - publishing - publishAllPublicationsToLubanPlusRepository
 task androidSourcesJar(type: Jar) {
-    classifier = 'sources'
+    archiveClassifier = 'sources'
     from android.sourceSets.main.java.source
 
     exclude "**/R.class"  //排除`R.class`
@@ -11,8 +11,8 @@ task androidSourcesJar(type: Jar) {
 }
 
 //--- 修改配置一 ---
-ext {path=
-        PUBLISH_GROUP_ID = 'io.github.FDoubleman'
+ext {
+    PUBLISH_GROUP_ID = 'io.github.FDoubleman'
     PUBLISH_ARTIFACT_ID = 'LubanPlus'
     PUBLISH_VERSION = '1.0.2'
 }
