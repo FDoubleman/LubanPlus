@@ -4,12 +4,12 @@ plugins {
 
 android {
     namespace = "cn.xdf.lubanplus"
-    compileSdk = 30
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "cn.xdf.lubanplus"
         minSdk = 21
-        targetSdk = 30
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
@@ -32,12 +32,12 @@ android {
 
 dependencies {
 
-    implementation("androidx.appcompat:appcompat:1.3.0")
-    implementation("com.google.android.material:material:1.4.0")
-    implementation("androidx.constraintlayout:constraintlayout:2.0.4")
-    implementation("androidx.navigation:navigation-fragment:2.3.5")
-    implementation("androidx.navigation:navigation-ui:2.3.5")
-    implementation("top.zibin:Luban:1.1.8")
+    implementation(libs.androidx.appcompat)
+    implementation(libs.material)
+    implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.navigation.fragment)
+    implementation(libs.androidx.navigation.ui)
+    implementation(libs.top.zibin.luban)
     implementation(project(":lubanPlus"))
 
 }

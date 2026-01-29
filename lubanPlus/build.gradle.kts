@@ -11,11 +11,11 @@ plugins {
 
 android {
     namespace = "cn.xdf.lubanplus.lubanPlus"
-    compileSdk = 30
+    compileSdk = 34
 
     defaultConfig {
         minSdk = 21
-        targetSdk = 30
+        targetSdk = 34
         consumerProguardFiles("consumer-rules.pro")
     }
 
@@ -38,8 +38,8 @@ android {
 }
 
 dependencies {
-    implementation("androidx.appcompat:appcompat:1.3.0")
-    implementation("com.google.android.material:material:1.4.0")
+    implementation(libs.androidx.appcompat)
+    implementation(libs.material)
 }
 
 afterEvaluate {
